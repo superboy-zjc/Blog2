@@ -29,7 +29,7 @@
 <meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/01/23/10-08-07-ec563e9673b3d9c4d55a1a45655b3b1c.png">
 <meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/01/23/10-08-47-e3ed56a6d80e6d21efcfdbc265c265d0.png">
 <meta property="article:published_time" content="2024-01-21T22:24:33.000Z">
-<meta property="article:modified_time" content="2024-01-23T15:36:26.776Z">
+<meta property="article:modified_time" content="2024-01-23T15:37:34.235Z">
 <meta property="article:author" content="2h0ng, Zhong">
 <meta property="article:tag" content="ctf">
 <meta name="twitter:card" content="summary">
@@ -228,7 +228,8 @@
 <li>If the check gets passed, it will accept the transfer request and insert a new transaction record into the <code>batch_transactions</code> table. Otherwise, the request will be rejected immediately.</li>
 </ol>
 <p><img src="https://api.2h0ng.wiki/noteimages/2024/01/23/10-08-07-ec563e9673b3d9c4d55a1a45655b3b1c.png" alt="img"></p>
-<p>So, when we create the second transaction with the same <code>batchid</code>, we would get rejected. However, we <strong>can</strong> exploit it by concurrently sending two transfer requests with the same <code>batchid</code> in a very short timeframe. This approach can bypass the check due to the absence of a lock, potentially allowing both transactions to proceed as the table may not yet reflect the new record.</p>
+<p>So, when we create the second transaction with the same <code>batchid</code>, we would get rejected.</p>
+<p>However, we <strong>can</strong> exploit it by concurrently sending two transfer requests with the same <code>batchid</code> in a very short timeframe. This approach can bypass the check due to the absence of a lock, potentially allowing both transactions to proceed as the table may not yet reflect the new record.</p>
 <p>Ideally,  Implementing a lock before the check and releasing it after the insertion would safeguard the entire verification and transaction process against race condition attacks.</p>
 <p><img src="https://api.2h0ng.wiki/noteimages/2024/01/23/10-08-47-e3ed56a6d80e6d21efcfdbc265c265d0.png" alt="img"></p>
 
