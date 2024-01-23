@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Summary This is a compiler optimization report for my course project at JHU. Feel free to check out the source code here.  After implementing several optimization processes, including high-level optim">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Compiler Optimization Strategies and Implementation">
+<meta property="og:url" content="https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/index.html">
+<meta property="og:site_name" content="Zhong&#39;s Blog">
+<meta property="og:description" content="Summary This is a compiler optimization report for my course project at JHU. Feel free to check out the source code here.  After implementing several optimization processes, including high-level optim">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/14-50-24-f60ca9ff8f3c29981f24fbe2ed9df847.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/22-33-09-f1ab62902d87dd5475a4c92b1cc7dc28.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/23-17-06-f38ae4ad23d06bc05d8bf29bb34e5a4b.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/23-48-12-796973699bff37da8ab84c3c2eeebf93.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/01-08-26-b9d839c12cd8a006719c21c1e1f3b840.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/13-38-15-57ed4b7ef5e66ed623c453878834baaf.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/14-30-32-d3eae5d7ccf1cb2397038b0141c2e04e.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/14-40-34-b4777a238b6b9cb8e45debb4eb87aa84.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/21-38-59-d68b2ec47ee6da071f9886dc42c59627.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/22-11-59-12da399afb0bc2b5bf3cac827069b365.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/22-36-37-3509fa0d99b95cc252257768b8689b8e.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/23-06-41-8a7b41d1c19406d9ea6719475d5b433c.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/23-11-39-7c67ee665fbed913d554fb13ecb2c196.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/00-10-04-c55261a14962afee805bfe4d34644fec.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/00-13-23-15a8e45acd233fbca6228a8d54cb50e4.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/00-28-15-7b17be17a4c7217284b657d37fc6451a.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/20-55-20-829bb19250233d3f3a2554841261db82.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/01-52-31-f3b32e63f311f25fafe7b28b1344a888.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/02-02-55-a68f37e138464ec505618d9638b9161d.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/02-10-19-8b3f0a80fa70b819315b88a9951470f1.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/02-18-54-239dd91a1b1c2d8e860837c321a23f00.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/21-01-36-add48efb8c9ea20b71c5729b339db3b1.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/21-04-56-f75ec7dcbb78e5312c523d369d24b580.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/21-06-53-3b1a871b7c40da27a9e37b6139601d60.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/21-18-57-a1897a4a08c533a7ca89616f44588a61.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/01-57-28-c3e8b8f1ea599d18e79c681fc0a00945.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/02-05-28-382692996fce259bf8a608b235c3945e.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/02-15-04-e5cc4d6e0b41cb0aac2d18e6c32b7d72.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/12/02-21-14-18afdf914906f8e79cbf6034e6550d0e.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/21-20-35-1a5bd3e29225e93eff82a546debcfbfd.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/21-21-49-d5cb0181972ff9dc9de827db53ce9eed.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2023/12/10/21-25-34-1c7c44386f96a5a5e1fcf4b0c752eda0.png">
+<meta property="article:published_time" content="2023-12-10T22:24:33.000Z">
+<meta property="article:modified_time" content="2024-01-23T03:55:29.285Z">
+<meta property="article:author" content="2h0ng, Zhong">
+<meta property="article:tag" content="code analysis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://api.2h0ng.wiki/noteimages/2023/12/11/14-50-24-f60ca9ff8f3c29981f24fbe2ed9df847.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Compiler Optimization Strategies and Implementation</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JRNNF9TMHE"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JRNNF9TMHE');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/01/21/Insomni-hack-CTF-Writeup/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/09/16/CSAW-2023/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&text=Compiler Optimization Strategies and Implementation"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&is_video=false&description=Compiler Optimization Strategies and Implementation"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Compiler Optimization Strategies and Implementation&body=Check out this article: https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&name=Compiler Optimization Strategies and Implementation&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&t=Compiler Optimization Strategies and Implementation"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Summary"><span class="toc-number">1.</span> <span class="toc-text">Summary</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Optimizations"><span class="toc-number">2.</span> <span class="toc-text">Optimizations</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#High-Level-Optimization"><span class="toc-number">2.0.1.</span> <span class="toc-text">High-Level Optimization</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Local-optimization"><span class="toc-number">2.0.1.1.</span> <span class="toc-text">Local optimization</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Low-level-optimization"><span class="toc-number">2.0.2.</span> <span class="toc-text">Low-level optimization</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#High-level-Optimization"><span class="toc-number">2.1.</span> <span class="toc-text">High-level Optimization</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Value-Numbering"><span class="toc-number">2.1.1.</span> <span class="toc-text">Local Value Numbering</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">Improvement of Performance(LVN)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Copy-propagation"><span class="toc-number">2.1.2.</span> <span class="toc-text">Local Copy propagation</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation"><span class="toc-number">2.1.2.1.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Constant-folding"><span class="toc-number">2.1.3.</span> <span class="toc-text">Local Constant folding</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding"><span class="toc-number">2.1.3.1.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation, Local Constant folding)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Dead-Store-Elimination"><span class="toc-number">2.1.4.</span> <span class="toc-text">Dead Store Elimination</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination"><span class="toc-number">2.1.4.1.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Register-Allocation"><span class="toc-number">2.1.5.</span> <span class="toc-text">Local Register Allocation</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Strategies"><span class="toc-number">2.1.5.1.</span> <span class="toc-text">Strategies</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Allocation-for-Temporary-Values"><span class="toc-number">2.1.5.2.</span> <span class="toc-text">Allocation for Temporary Values</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Allocation-for-local-variables"><span class="toc-number">2.1.5.3.</span> <span class="toc-text">Allocation for local variables</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination-local-register-allocation"><span class="toc-number">2.1.5.4.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Low-level-Optimization"><span class="toc-number">2.2.</span> <span class="toc-text">Low-level Optimization</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Peephole-optimization"><span class="toc-number">2.2.0.1.</span> <span class="toc-text">Peephole optimization</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination-local-register-allocation-peephole-optimization"><span class="toc-number">2.2.0.2.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation, peephole optimization)</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Remaining-inefficiencies"><span class="toc-number">3.</span> <span class="toc-text">Remaining inefficiencies</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Just-Local-We-Can-Do-Global"><span class="toc-number">3.0.1.</span> <span class="toc-text">Just Local, We Can Do Global</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Memory-Values"><span class="toc-number">3.0.2.</span> <span class="toc-text">Memory Values</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Optimization-Order"><span class="toc-number">3.0.3.</span> <span class="toc-text">Optimization Order</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Conclusion"><span class="toc-number">4.</span> <span class="toc-text">Conclusion</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Appendix"><span class="toc-number">5.</span> <span class="toc-text">Appendix</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Test-recording-for-example29-c"><span class="toc-number">5.1.</span> <span class="toc-text">Test recording for example29.c</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Unoptimized"><span class="toc-number">5.1.1.</span> <span class="toc-text">Unoptimized</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#High-Level-Optimization-1"><span class="toc-number">5.1.2.</span> <span class="toc-text">High-Level Optimization:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Low-Level-optimization"><span class="toc-number">5.1.3.</span> <span class="toc-text">Low-Level optimization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Gcc-o2"><span class="toc-number">5.1.4.</span> <span class="toc-text">Gcc -o2</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Test-recording-for-example31-c"><span class="toc-number">5.2.</span> <span class="toc-text">Test recording for example31.c</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Unoptimized-1"><span class="toc-number">5.2.1.</span> <span class="toc-text">Unoptimized</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#High-Level-Optimization-2"><span class="toc-number">5.2.2.</span> <span class="toc-text">High-Level Optimization:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Low-Level-opimization"><span class="toc-number">5.2.3.</span> <span class="toc-text">Low-Level opimization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Gcc-o2-1"><span class="toc-number">5.2.4.</span> <span class="toc-text">Gcc -o2</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Compiler Optimization Strategies and Implementation
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">2h0ng, Zhong</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-12-10T22:24:33.000Z" class="dt-published" itemprop="datePublished">2023-12-10</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/code-analysis/" rel="tag">code analysis</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h1><blockquote>
+<p>This is a compiler optimization report for my course project at JHU. Feel free to check out the source code <a target="_blank" rel="noopener" href="https://github.com/superboy-zjc/Compilers-and-Interpreters/tree/main/assign05-compiler-codeOptimization">here</a>.</p>
+</blockquote>
+<p>After implementing several optimization processes, including high-level optimizations (local value numbering, local copy propagation, local constant folding, dead store elimination, local register allocation) and low-level optimization (peephole), we have observed a remarkable enhancement in performance.</p>
+<p>Here, we benchmarked the compiler using <code>example29.c</code> and <code>example31.c</code> , which are relatively intricate programs involving millions of computations. </p>
+<p><strong>Runtime result for example29.c</strong></p>
+<p>The execution time was reduced from 3.67 seconds to 0.74 seconds, which represents a performance improvement of approximately 396%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.67s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, local copy propagation,local constant folding, local register allocation)</td>
+<td>1.40s</td>
+</tr>
+<tr>
+<td>Optimized(peephole)</td>
+<td>0.74s</td>
+</tr>
+<tr>
+<td>Gcc (-O2 optimization)</td>
+<td>0.47s</td>
+</tr>
+</tbody></table>
+<p><strong>Runtime result for example31.c</strong></p>
+<p>The execution time for example31.c decreased from 3.49 seconds to 0.86 seconds, indicating a performance increase of about 306%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.49s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, local copy propagation,local constant folding, local register allocation)</td>
+<td>1.33s</td>
+</tr>
+<tr>
+<td>Optimized(peephole)</td>
+<td>0.86s</td>
+</tr>
+<tr>
+<td>Gcc (-O2 optimization)</td>
+<td>0.48s</td>
+</tr>
+</tbody></table>
+<p>In subsequent chapters, I will provide a detailed explanation of these improvements, the optimizations used, and their effectiveness.</p>
+<h1 id="Optimizations"><a href="#Optimizations" class="headerlink" title="Optimizations"></a>Optimizations</h1><p>There are a variety of optimization techniques we can choose to enhance the run-time efficiency of the target programming language. These techniques can be applied to either high-level or low-level code and in either a local or global scope. An optimally optimized measure, like what the GCC project achieves, involves years of dedicated research by hundreds of scholars. Given our limited time this semester, our strategy is to select optimization algorithms that offer significant performance improvements and are feasible to implement. Following Dr. Hovermeyer’s advice, my optimization strategies are outlined below.</p>
+<h3 id="High-Level-Optimization"><a href="#High-Level-Optimization" class="headerlink" title="High-Level Optimization"></a><strong>High-Level Optimization</strong></h3><p>During the high-level code optimization process, I implemented the following strategies:</p>
+<ul>
+<li><strong>Local Value Numbering</strong>: This process also includes Local Constant Folding, Dead Store Elimination, and Local Copy Propagation.</li>
+<li><strong>Local Register Allocation</strong></li>
+</ul>
+<h4 id="Local-optimization"><a href="#Local-optimization" class="headerlink" title="Local optimization"></a>Local optimization</h4><p>As you can see, I used many optimization schemes that are performed in a local scope, such as <u>local</u> value numbering, <u>local</u> constant folding, <u>local</u> copy propagation, and <u>local</u> register allocation. So what does ‘local’ mean?</p>
+<p>Here, what I meant by ‘local’, is to conduct optimization in basic blocks, which are units of a control-flow graph. In a basic block, the last instruction must be a branch to another block.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/11/14-50-24-f60ca9ff8f3c29981f24fbe2ed9df847.png" alt="image-20231103202153757"></p>
+<p>[Image: Dr. Hovemeyer, Compilers and Interpreters, Fall 2023]</p>
+<p>We conduct our local optimization on each basic block of the program’s control-flow graph. Performing optimization in a global scope absolutely would be better, while it requires more effort and is considerably more complex.</p>
+<h3 id="Low-level-optimization"><a href="#Low-level-optimization" class="headerlink" title="Low-level optimization"></a><strong>Low-level optimization</strong></h3><p>In low-level code optimization, I conduct the following strategy.</p>
+<ul>
+<li>Peephole optimziation</li>
+</ul>
+<h2 id="High-level-Optimization"><a href="#High-level-Optimization" class="headerlink" title="High-level Optimization"></a>High-level Optimization</h2><p>Instead of diving directly into optimizations at the low-level assembly language code, we can take advantage of immediate representations of source programs. This approach allows us to perform optimizations progressively, moving from shallower to deeper levels. It provides a more natural workflow and prevents confusion that might arise from working directly with intricate low-level code, which can be challenging to debug. A best practice for developing complex projects, like a compiler, is to segment the overall goal into smaller, manageable tasks and tackle them individually.</p>
+<p>Thanks to Dr. Hovermeyer’s contribution, we can utilize immediate representations of the source code, which enables us to optimize the code in the high-level phase first and then seamlessly translate these optimizations into the low-level code.</p>
+<p>My strategy begins with conducting <em>local value numbering</em> on the high-level code.</p>
+<h3 id="Local-Value-Numbering"><a href="#Local-Value-Numbering" class="headerlink" title="Local Value Numbering"></a>Local Value Numbering</h3><p>Local value numbering is a strategy to eliminate replicated computations in the code. The high-level code was generated by traversing each AST node with limited context, so it’s hard to eliminate repeated computation during that process. With the generated high-level code, we can analyze value flow in a broader context, annotate each operand with a value number, and record the computations performed on each value number. If we later find a computation that we have already computed, we can simply reuse and apply the computed result to the destination operand without computing it again. The following code snippet from example29.c will be used to further explain this concept.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/22-33-09-f1ab62902d87dd5475a4c92b1cc7dc28.png" alt="image-20231210223309156"></p>
+<p>For instance, the instruction <code>localaddr vr42, $4000000</code> was computed before the instruction <code>localaddr vr57, $4000000</code>, and we assume that the value in <code>vr42</code> remains unchanged. In this case,  <code>localaddr vr57, $4000000</code> is a redundant computation. We can avoid this redundancy by moving the value from vr42 to vr57.</p>
+<p>To achieve this, we allocate a <em>Value Number</em> to every register and record every computation in a mapping structure <em><strong>{opcode, value number of source operand1, value number of source operand2 (if any)} -&gt; value number of the destination operand</strong></em>. In the instruction <code>localaddr vr42, $4000000</code>, vr42 is assigned value number A, and $4000000 is assigned value number B. The mapping would be <em><strong>{localaddr, B} -&gt; A</strong></em>.</p>
+<p>When encountering the instruction <code>localaddr vr57, $4000000</code>, we check if each operand has been previously assigned a value number. If not, we assign a new value number. In this case, vr57 receives a new value number C, and $4000000 retains its value number B. Now, we have a key for the current computation mapping as <em><strong>{localaddr, B}</strong></em>. Upon checking the mappings, we find an existing key with the same computation, indicating redundancy. Therefore, we modify vr57 from value number C to A and eliminate the redundant computation by replacing the instruction with <code>mov_q vr57, vr42</code></p>
+<p>The same process applies to the instruction <code>mul_l vr43, vr13, vr10</code>.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/23-17-06-f38ae4ad23d06bc05d8bf29bb34e5a4b.png" alt="image-20231210231706428"></p>
+<p>The elimination process of Local Value Numbering typically occurs in several rounds since each round may create opportunities for further optimization. After several iterations, the result is as follows:</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/23-48-12-796973699bff37da8ab84c3c2eeebf93.png" alt="image-20231210234811672"></p>
+<p>After conducting Local Value Numbering, we ensure that each basic block contains the necessary computations without redundancy. Our next goal is to eliminate unnecessary allocated virtual registers. Many registers, serving as temporary holders for values during computations, often become dead - unused after their computation. We leverage <em>Copy Propagation</em> and <em>Dead Store Elimination</em> to remove most of these redundant registers. Concurrently, we perform <em>Constant Folding</em>, computing constant values during the compiling time. This straightforward approach, when combined with Copy Propagation, helps improve the performance of the target language by reducing computational instructions.</p>
+<h4 id="Improvement-of-Performance-LVN"><a href="#Improvement-of-Performance-LVN" class="headerlink" title="Improvement of Performance(LVN)"></a>Improvement of Performance(LVN)</h4><p><strong>Runtime result for example29.c</strong></p>
+<p>The execution time was reduced from 3.67 seconds to 3.06 seconds, which represents a performance improvement of approximately 20%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.67s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+</tbody></table>
+<p><strong>Runtime result for example31.c</strong></p>
+<p>Same enhancement for example31.c, the execution time was reduced from 3.49 seconds to 3.06 seconds, involving an approximate increase in performance of 14%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.49s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+</tbody></table>
+<h3 id="Local-Copy-propagation"><a href="#Local-Copy-propagation" class="headerlink" title="Local Copy propagation"></a>Local Copy propagation</h3><p>Copy propagation is a strategy to reduce the usage of registers. After performing local value numbering, each register is assigned a unique value number. Often, many registers share the same value number.</p>
+<p>The central idea of this strategy is to unify all registers with identical value numbers into a single register based on specific rules. This unification creates opportunities to eliminate redundant registers. In practice, for registers sharing the same value number, we sort them by their register number and identify the smallest number as the unified register number. Then, we replace each register that shares this value number with the unified register number. If a value number stores an immediate value, we straightforwardly replace the immediate value with the register.</p>
+<p>Below are code snippets from example29.c, illustrating how copy propagation works in practice:<img src="https://api.2h0ng.wiki/noteimages/2023/12/11/01-08-26-b9d839c12cd8a006719c21c1e1f3b840.png" alt="image-20231211010825890"></p>
+<p>This approach streamlines the code by efficiently managing register assignments, which contributes to the overall performance optimization of the compiled program.</p>
+<h4 id="Improvement-of-Performance-LVN-Local-Copy-propagation"><a href="#Improvement-of-Performance-LVN-Local-Copy-propagation" class="headerlink" title="Improvement of Performance(LVN, Local Copy propagation)"></a>Improvement of Performance(LVN, Local Copy propagation)</h4><p><strong>Runtime result for example29.c</strong></p>
+<p>The execution time was reduced from 3.67 seconds to 3.08 seconds, which represents a performance improvement of approximately 19.2%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.67s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.08s</td>
+</tr>
+</tbody></table>
+<p><strong>Runtime result for example31.c</strong></p>
+<p>Same enhancement for example31.c, the execution time was reduced from 3.49 seconds to 3.06 seconds, involving an approximate increase in performance of 14%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.49s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.06s</td>
+</tr>
+</tbody></table>
+<h3 id="Local-Constant-folding"><a href="#Local-Constant-folding" class="headerlink" title="Local Constant folding"></a>Local Constant folding</h3><p>Performing constant computations during compile time is an effective way to simplify a portion of a program’s calculations. By resolving these computations early, we reduce the computational load in the target language, thereby enhancing the program’s performance</p>
+<p>The following image illustrates an example of Local Constant Folding in action within example05.c:</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/11/13-38-15-57ed4b7ef5e66ed623c453878834baaf.png" alt="image-20231211133815405"></p>
+<h4 id="Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding"><a href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding" class="headerlink" title="Improvement of Performance(LVN, Local Copy propagation, Local Constant folding)"></a>Improvement of Performance(LVN, Local Copy propagation, Local Constant folding)</h4><p><strong>Runtime result for example29.c</strong></p>
+<p>The execution time was reduced from 3.67 seconds to 3.02 seconds, which represents a performance improvement of approximately 21.5%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.67s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.08s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding)</td>
+<td>3.02s</td>
+</tr>
+</tbody></table>
+<p><strong>Runtime result for example31.c</strong></p>
+<p>Same enhancement for example31.c, the execution time was reduced from 3.49 seconds to 3.07 seconds, involving an approximate increase in performance of 13.7%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.49s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding)</td>
+<td>3.07s</td>
+</tr>
+</tbody></table>
+<h3 id="Dead-Store-Elimination"><a href="#Dead-Store-Elimination" class="headerlink" title="Dead Store Elimination"></a>Dead Store Elimination</h3><p>After rounds of copy propagation and constant folding, we unify all registers with the same value number into a single register. This unification creates opportunities to eliminate dead registers.</p>
+<p>A register is considered ‘alive’ from its point of definition until its last use. Conversely, a register is ‘dead’ at a point where it will not be used again or is set to be redefined in the future.</p>
+<p>For example, consider the following code segment: vr12 serves as a temporary register to hold the immediate value 5 for an addition computation. After this computation, vr12 is redefined, making it dead post-addition and alive again for a new value and definition.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov_l vr12, $5		</span><br><span class="line">mov_l vr13, $16 	</span><br><span class="line">add_l vr14, vr12, vr13	</span><br><span class="line">mov_l vr15, vr14		</span><br><span class="line">mov_ vr12, $17			</span><br></pre></td></tr></table></figure>
+
+<p>If a register is dead as a destination operand in an instruction, that instruction can be eliminated, as the value in the register will no longer be used. By integrating dead store elimination with copy propagation, we can significantly reduce the use of temporary registers.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/11/14-30-32-d3eae5d7ccf1cb2397038b0141c2e04e.png" alt="image-20231211143032497"></p>
+<p>The code snippet from example29.c demonstrates an instance of dead store elimination. The comments on the right side show the liveness analysis results, obtained through global data flow analysis. This analysis provides a comprehensive view of whether a value is alive or dead at any given point in the code.</p>
+<p>Also, a notable case here is vr16 becomes dead after the <code>mov_q (vr16), vr0</code> operation. However, we do not consider (vr16) as a dead store since the value is stored in memory rather than in the register. Our liveness analysis does not extend to memory value analysis.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/11/14-40-34-b4777a238b6b9cb8e45debb4eb87aa84.png" alt="image-20231211144034407"></p>
+<h4 id="Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination"><a href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination" class="headerlink" title="Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination)"></a>Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination)</h4><p><strong>Runtime result for example29.c</strong></p>
+<p>The execution time was reduced from 3.67 seconds to 2.54 seconds, which represents a performance improvement of approximately 44.5%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.67s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.08s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding)</td>
+<td>3.02s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination)</td>
+<td>2.54s</td>
+</tr>
+</tbody></table>
+<p><strong>Runtime result for example31.c</strong></p>
+<p>Same enhancement for example31.c, the execution time was reduced from 3.49 seconds to 2.37 seconds, involving an approximate increase in performance of 47.3%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.49s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding)</td>
+<td>3.07s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination)</td>
+<td>2.37s</td>
+</tr>
+</tbody></table>
+<h3 id="Local-Register-Allocation"><a href="#Local-Register-Allocation" class="headerlink" title="Local Register Allocation"></a>Local Register Allocation</h3><p>After completing local value numbering, local copy propagation, local constant folding, and dead store elimination, we achieve a cleaner high-level code. In this refined code, all registers are assigned clear responsibilities, and redundant computations are eliminated. Our next step is to allocate machine registers for each virtual register, since the original low-level code generator allocated virtual registers in memory, which, compared to register-based operations, is considerably slower and can significantly impact the performance of the generated code.</p>
+<h4 id="Strategies"><a href="#Strategies" class="headerlink" title="Strategies"></a>Strategies</h4><p>Our allocation strategy is divided into two parts: allocation for local variables and allocation for temporary values.</p>
+<p><strong>What Are Temporary Values?</strong></p>
+<p>Temporary values are stored in temporary registers for specific computations and typically have a short lifespan, often becoming obsolete immediately after the computation. Essentially, they act as computation helpers, temporarily holding values necessary to complete a computation. This is particularly important in low-level assembly code, which requires more operations to implement a computation than high-level program code.</p>
+<p>Consider, for example, a computation in a C program like <code>c = a * 8 + b</code>. In this scenario, a, b, and c are local variables allocated to fixed virtual registers vr10, vr11, and vr12. However, to translate such a computation into low-level code, a temporary value, like vr20, is necessary to hold the result of computations temporarily. Given that the maximum number of operands in an ALU operation in low-level code is 2, it is impossible to complete the computation in low-level code without temporary registers.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov_l $8, vr20</span><br><span class="line">mul_l $vr10, vr20</span><br><span class="line">add_l vr11, vr20</span><br><span class="line">mov_l, vr20, vr12</span><br></pre></td></tr></table></figure>
+
+<p><strong>What Are Local Variables?</strong></p>
+<p>Local variables are variables that are defined within a program. Our high-level register allocator assigns fixed virtual register numbers to these local variables.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/11/21-38-59-d68b2ec47ee6da071f9886dc42c59627.png" alt="image-20231211213847125"></p>
+<p><strong>Machine Registers Allocation</strong></p>
+<p>According to the x86-64 Linux register use conventions, there are two categories of registers: caller-saved and callee-saved registers.</p>
+<p><u>caller-saved registers:</u> %r10, %r11, %rdi, %rsi, %rdx, %rcx, %r8, %r9</p>
+<p><u>callee-saved registers:</u> %rbx, %rbp, %r12, %r13, %13, %14, %15</p>
+<p>We allocate caller-saved registers for temporary values and callee-saved registers for local variables.</p>
+<h4 id="Allocation-for-Temporary-Values"><a href="#Allocation-for-Temporary-Values" class="headerlink" title="Allocation for Temporary Values"></a>Allocation for Temporary Values</h4><p>For virtual registers not representing local variables, we allocate caller-saved registers if they have not been previously allocated. To achieve this, we maintain a register pool containing caller-saved registers. When a temporary virtual register is unallocated, we assign it a caller-saved machine register from this pool.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/11/22-11-59-12da399afb0bc2b5bf3cac827069b365.png" alt="image-20231211221159109"></p>
+<p>However, the number of available caller-saved registers is finite. To allocate as many caller-saved machine registers as possible for temporary values, we need to find a way to reuse some of the caller-saved registers. This involves conducting liveness analysis again.</p>
+<p>By leveraging liveness analysis, we can return machine registers that were allocated for a temporary value back to the machine register pool when the temporary value becomes dead.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/11/22-36-37-3509fa0d99b95cc252257768b8689b8e.png" alt="image-20231211223637397"></p>
+<h4 id="Allocation-for-local-variables"><a href="#Allocation-for-local-variables" class="headerlink" title="Allocation for local variables"></a>Allocation for local variables</h4><p>We allocate callee-saved registers for local variables. The overall process is similar to the allocation for temporary values, with two key differences:</p>
+<ul>
+<li>We have to compute ranks for each local variables and allocate callee-saved registers based on these ranks. The higher the rank of the variable, the higher its priority for allocation.</li>
+<li>Unlike caller-saved registers, the values in callee-saved registers are expected to change across different functions. Therefore, if we allocate a callee-saved register for a local variable within a function, we need to save and recover the value of these callee-saved registers during the prologue and epilogue phases using <code>push</code> and <code>pop</code> instructions.</li>
+</ul>
+<p>To calculate reasonable ranks for each variable, we have established a rule where the basic score of a variable reference is set to 10 raised to the power of n. In this context, ‘n’ represents the depth of the loop where the current variable reference is located. The total rank of a local variable will be the sum of the basic scores for each of its references.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/11/23-06-41-8a7b41d1c19406d9ea6719475d5b433c.png" alt="image-20231211230640827"></p>
+<p>As previously discussed, the use of caller-saved registers requires saving and recovering operations to ensure these registers can be safely used across different functions.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/11/23-11-39-7c67ee665fbed913d554fb13ecb2c196.png" alt="image-20231211231139192"></p>
+<h4 id="Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination-local-register-allocation"><a href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination-local-register-allocation" class="headerlink" title="Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation)"></a>Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation)</h4><p><strong>Runtime result for example29.c</strong></p>
+<p>The execution time was reduced from 3.67 seconds to 1.40 seconds, which represents a performance improvement of approximately 162%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.67s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.08s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding)</td>
+<td>3.02s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination)</td>
+<td>2.54s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation)</td>
+<td>1.40s</td>
+</tr>
+</tbody></table>
+<p><strong>Runtime result for example31.c</strong></p>
+<p>Same enhancement for example31.c, the execution time was reduced from 3.49 seconds to 1.33 seconds, involving an approximate increase in performance of 162%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.49s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding)</td>
+<td>3.07s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination)</td>
+<td>2.37s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation)</td>
+<td>1.33s</td>
+</tr>
+</tbody></table>
+<h2 id="Low-level-Optimization"><a href="#Low-level-Optimization" class="headerlink" title="Low-level Optimization"></a>Low-level Optimization</h2><p>After rounds of high-level optimizations discussed above, we now have an improved high-level representation language. The next step is to conduct peephole optimization to further optimize the low-level code.</p>
+<h4 id="Peephole-optimization"><a href="#Peephole-optimization" class="headerlink" title="Peephole optimization"></a>Peephole optimization</h4><p>Peephole optimization is a relatively straightforward optimization technique, which involves replacing fragments of intricate and inefficient instructions with more advanced and efficient ones. Since our target assembly language is X86-64, there are many advanced instructions available that can replace the inefficient ones generated by our low-level code generator.</p>
+<p>Peephole optimization operates based on predefined rules or patterns. We can define various patterns to match the fragments of instructions that we wish to replace and identify corresponding better idioms that serve as more efficient alternative instructions.</p>
+<p>The peephole optimization implemented in our compiler involves matchers, which match patterns in basic blocks and replace them with better idioms. Liveness analysis is also utilized to facilitate various changes.</p>
+<p>Here, we will discuss the key patterns used in our peephole optimization:</p>
+<p><strong>1. Pattern for Array Computation</strong></p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/00-10-04-c55261a14962afee805bfe4d34644fec.png" alt="image-20231212001004287"></p>
+<p><strong>2. Pattern for Conditional Jump</strong></p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/00-13-23-15a8e45acd233fbca6228a8d54cb50e4.png" alt="image-20231212001323371"></p>
+<p><strong>3. Pattern for Array Index Computation</strong></p>
+<p>In some situations, array computations cannot be translated into the most optimized idioms due to certain target operands being active and non-eliminable. In such cases, we can select alternative idioms with the aid of liveness analysis.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/00-28-15-7b17be17a4c7217284b657d37fc6451a.png" alt="image-20231212002815250"></p>
+<h4 id="Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination-local-register-allocation-peephole-optimization"><a href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination-local-register-allocation-peephole-optimization" class="headerlink" title="Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation, peephole optimization)"></a>Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation, peephole optimization)</h4><p><strong>Runtime result for example29.c</strong></p>
+<p>The execution time was reduced from 3.67 seconds to 0.74 seconds, which represents a performance improvement of approximately 396%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.67s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.08s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding)</td>
+<td>3.02s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination)</td>
+<td>2.54s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation)</td>
+<td>1.40s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation, peephole optimization)</td>
+<td>0.74s</td>
+</tr>
+</tbody></table>
+<p><strong>Runtime result for example31.c</strong></p>
+<p>Same enhancement for example31.c, the execution time was reduced from 3.49 seconds to 0.86 seconds, involving an approximate increase in performance of 306%.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Average running time(over 3 runs)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unoptimized</td>
+<td>3.49s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation)</td>
+<td>3.06s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding)</td>
+<td>3.07s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination)</td>
+<td>2.37s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation)</td>
+<td>1.33s</td>
+</tr>
+<tr>
+<td>Optimized(local value numbering, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation, peephole optimization)</td>
+<td>0.86s</td>
+</tr>
+</tbody></table>
+<h1 id="Remaining-inefficiencies"><a href="#Remaining-inefficiencies" class="headerlink" title="Remaining inefficiencies"></a>Remaining inefficiencies</h1><p>Although the performance of the generated code has improved significantly, there are still many remaining inefficiencies in the optimizations.</p>
+<h3 id="Just-Local-We-Can-Do-Global"><a href="#Just-Local-We-Can-Do-Global" class="headerlink" title="Just Local, We Can Do Global"></a>Just Local, We Can Do Global</h3><p>During most of the optimization processes, including local value numbering, local copy propagation, and local constant folding, our optimization context is always focused on the basic blocks. However, if we leverage data flow analysis to conduct these optimizations globally, the quality of the generated code could be significantly enhanced.</p>
+<h3 id="Memory-Values"><a href="#Memory-Values" class="headerlink" title="Memory Values"></a>Memory Values</h3><p>Being able to track memory values would greatly improve our optimization capabilities. In our current approach to local value numbering, local copy propagation, local constant folding, and dead store elimination, we only focus on immediate values or values stored in registers. Memory reference values are not considered. Crafting reasonable algorithms to track memory values during compile time would undoubtedly enhance the quality of the generated code.</p>
+<h3 id="Optimization-Order"><a href="#Optimization-Order" class="headerlink" title="Optimization Order"></a>Optimization Order</h3><p>After peephole optimization, numerous machine registers may be released and become available for reallocation. We can further improve this process by reallocating machine registers after the peephole optimization, which would significantly enhance the efficiency of machine register usage.</p>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>This comprehensive report has outlined the numerous optimization processes applied to our compiler, emphasizing both high-level and low-level optimizations. Through meticulous implementation and testing, we have successfully enhanced the performance of complex programs, as evidenced by our benchmarks with <code>example29.c</code> and <code>example31.c</code>.</p>
+<p>The high-level optimizations, including local value numbering, local copy propagation, local constant folding, dead store elimination, and local register allocation, were instrumental in refining the high-level code. These optimizations not only streamlined the code by reducing redundancy but also significantly boosted the run-time efficiency. The integration of low-level peephole optimization further augmented this efficiency, showcasing the power of replacing inefficient instruction fragments with more effective alternatives.</p>
+<p>Our results are striking. For instance, in <code>example29.c</code>, the execution time was dramatically reduced from 3.67 seconds to 0.74 seconds, demonstrating a 396% improvement. Similar improvements were observed in <code>example31.c</code>, where the execution time was cut down from 3.49 seconds to 0.86 seconds, marking a 306% increase in performance.</p>
+<p>However, despite these significant advancements, there remain areas for further enhancement. The potential for global optimization, better memory value tracking, and improved optimization order highlight ongoing opportunities to refine our compiler’s performance even further.</p>
+<h1 id="Appendix"><a href="#Appendix" class="headerlink" title="Appendix"></a>Appendix</h1><h2 id="Test-recording-for-example29-c"><a href="#Test-recording-for-example29-c" class="headerlink" title="Test recording for example29.c"></a>Test recording for example29.c</h2><h3 id="Unoptimized"><a href="#Unoptimized" class="headerlink" title="Unoptimized"></a>Unoptimized</h3><p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/20-55-20-829bb19250233d3f3a2554841261db82.png" alt="image-20231210205520223"></p>
+<h3 id="High-Level-Optimization-1"><a href="#High-Level-Optimization-1" class="headerlink" title="High-Level Optimization:"></a>High-Level Optimization:</h3><ul>
+<li>local value numbering</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/01-52-31-f3b32e63f311f25fafe7b28b1344a888.png" alt="image-20231212015231111"></p>
+<ul>
+<li>local copy propagation</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/02-02-55-a68f37e138464ec505618d9638b9161d.png" alt="image-20231212020255237"></p>
+<ul>
+<li>local constant folding</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/02-10-19-8b3f0a80fa70b819315b88a9951470f1.png" alt="image-20231212021019174"></p>
+<ul>
+<li>dead store elimination</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/02-18-54-239dd91a1b1c2d8e860837c321a23f00.png" alt="image-20231212021853881"></p>
+<ul>
+<li>local register allocation</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/21-01-36-add48efb8c9ea20b71c5729b339db3b1.png" alt="image-20231210210136272"></p>
+<h3 id="Low-Level-optimization"><a href="#Low-Level-optimization" class="headerlink" title="Low-Level optimization"></a>Low-Level optimization</h3><ul>
+<li>Peephole</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/21-04-56-f75ec7dcbb78e5312c523d369d24b580.png" alt="image-20231210210455866"></p>
+<h3 id="Gcc-o2"><a href="#Gcc-o2" class="headerlink" title="Gcc -o2"></a>Gcc -o2</h3><p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/21-06-53-3b1a871b7c40da27a9e37b6139601d60.png" alt="image-20231210210653394"></p>
+<h2 id="Test-recording-for-example31-c"><a href="#Test-recording-for-example31-c" class="headerlink" title="Test recording for example31.c"></a>Test recording for example31.c</h2><h3 id="Unoptimized-1"><a href="#Unoptimized-1" class="headerlink" title="Unoptimized"></a>Unoptimized</h3><p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/21-18-57-a1897a4a08c533a7ca89616f44588a61.png" alt="image-20231210211856860"></p>
+<h3 id="High-Level-Optimization-2"><a href="#High-Level-Optimization-2" class="headerlink" title="High-Level Optimization:"></a>High-Level Optimization:</h3><ul>
+<li>local value numbering</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/01-57-28-c3e8b8f1ea599d18e79c681fc0a00945.png" alt="image-20231212015728603"></p>
+<ul>
+<li>local copy propagation</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/02-05-28-382692996fce259bf8a608b235c3945e.png" alt="image-20231212020528232"></p>
+<ul>
+<li>local constant folding</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/02-15-04-e5cc4d6e0b41cb0aac2d18e6c32b7d72.png" alt="image-20231212021504539"></p>
+<ul>
+<li>dead store elimination</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/12/02-21-14-18afdf914906f8e79cbf6034e6550d0e.png" alt="image-20231212022114005"></p>
+<ul>
+<li>local register allocation</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/21-20-35-1a5bd3e29225e93eff82a546debcfbfd.png" alt="image-20231210212035622"></p>
+<h3 id="Low-Level-opimization"><a href="#Low-Level-opimization" class="headerlink" title="Low-Level opimization"></a>Low-Level opimization</h3><ul>
+<li>Peephole</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/21-21-49-d5cb0181972ff9dc9de827db53ce9eed.png" alt="image-20231210212148848"></p>
+<h3 id="Gcc-o2-1"><a href="#Gcc-o2-1" class="headerlink" title="Gcc -o2"></a>Gcc -o2</h3><p><img src="https://api.2h0ng.wiki/noteimages/2023/12/10/21-25-34-1c7c44386f96a5a5e1fcf4b0c752eda0.png" alt="image-20231210212533908"></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Summary"><span class="toc-number">1.</span> <span class="toc-text">Summary</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Optimizations"><span class="toc-number">2.</span> <span class="toc-text">Optimizations</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#High-Level-Optimization"><span class="toc-number">2.0.1.</span> <span class="toc-text">High-Level Optimization</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Local-optimization"><span class="toc-number">2.0.1.1.</span> <span class="toc-text">Local optimization</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Low-level-optimization"><span class="toc-number">2.0.2.</span> <span class="toc-text">Low-level optimization</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#High-level-Optimization"><span class="toc-number">2.1.</span> <span class="toc-text">High-level Optimization</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Value-Numbering"><span class="toc-number">2.1.1.</span> <span class="toc-text">Local Value Numbering</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">Improvement of Performance(LVN)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Copy-propagation"><span class="toc-number">2.1.2.</span> <span class="toc-text">Local Copy propagation</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation"><span class="toc-number">2.1.2.1.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Constant-folding"><span class="toc-number">2.1.3.</span> <span class="toc-text">Local Constant folding</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding"><span class="toc-number">2.1.3.1.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation, Local Constant folding)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Dead-Store-Elimination"><span class="toc-number">2.1.4.</span> <span class="toc-text">Dead Store Elimination</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination"><span class="toc-number">2.1.4.1.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Register-Allocation"><span class="toc-number">2.1.5.</span> <span class="toc-text">Local Register Allocation</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Strategies"><span class="toc-number">2.1.5.1.</span> <span class="toc-text">Strategies</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Allocation-for-Temporary-Values"><span class="toc-number">2.1.5.2.</span> <span class="toc-text">Allocation for Temporary Values</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Allocation-for-local-variables"><span class="toc-number">2.1.5.3.</span> <span class="toc-text">Allocation for local variables</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination-local-register-allocation"><span class="toc-number">2.1.5.4.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Low-level-Optimization"><span class="toc-number">2.2.</span> <span class="toc-text">Low-level Optimization</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Peephole-optimization"><span class="toc-number">2.2.0.1.</span> <span class="toc-text">Peephole optimization</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Improvement-of-Performance-LVN-Local-Copy-propagation-Local-Constant-folding-Dead-Store-Elimination-local-register-allocation-peephole-optimization"><span class="toc-number">2.2.0.2.</span> <span class="toc-text">Improvement of Performance(LVN, Local Copy propagation, Local Constant folding, Dead Store Elimination, local register allocation, peephole optimization)</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Remaining-inefficiencies"><span class="toc-number">3.</span> <span class="toc-text">Remaining inefficiencies</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Just-Local-We-Can-Do-Global"><span class="toc-number">3.0.1.</span> <span class="toc-text">Just Local, We Can Do Global</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Memory-Values"><span class="toc-number">3.0.2.</span> <span class="toc-text">Memory Values</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Optimization-Order"><span class="toc-number">3.0.3.</span> <span class="toc-text">Optimization Order</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Conclusion"><span class="toc-number">4.</span> <span class="toc-text">Conclusion</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Appendix"><span class="toc-number">5.</span> <span class="toc-text">Appendix</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Test-recording-for-example29-c"><span class="toc-number">5.1.</span> <span class="toc-text">Test recording for example29.c</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Unoptimized"><span class="toc-number">5.1.1.</span> <span class="toc-text">Unoptimized</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#High-Level-Optimization-1"><span class="toc-number">5.1.2.</span> <span class="toc-text">High-Level Optimization:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Low-Level-optimization"><span class="toc-number">5.1.3.</span> <span class="toc-text">Low-Level optimization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Gcc-o2"><span class="toc-number">5.1.4.</span> <span class="toc-text">Gcc -o2</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Test-recording-for-example31-c"><span class="toc-number">5.2.</span> <span class="toc-text">Test recording for example31.c</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Unoptimized-1"><span class="toc-number">5.2.1.</span> <span class="toc-text">Unoptimized</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#High-Level-Optimization-2"><span class="toc-number">5.2.2.</span> <span class="toc-text">High-Level Optimization:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Low-Level-opimization"><span class="toc-number">5.2.3.</span> <span class="toc-text">Low-Level opimization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Gcc-o2-1"><span class="toc-number">5.2.4.</span> <span class="toc-text">Gcc -o2</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&text=Compiler Optimization Strategies and Implementation"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&is_video=false&description=Compiler Optimization Strategies and Implementation"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Compiler Optimization Strategies and Implementation&body=Check out this article: https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&title=Compiler Optimization Strategies and Implementation"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&name=Compiler Optimization Strategies and Implementation&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2023/12/10/Compiler-Optimization/&t=Compiler Optimization Strategies and Implementation"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    2h0ng, Zhong
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
